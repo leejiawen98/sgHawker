@@ -1,0 +1,198 @@
+<ion-header>
+  <ion-toolbar
+    [ngClass]="{
+      'customer-header-background-color': user !== undefined,
+      'hawker-header-background-color': outlet !== undefined
+    }"
+  >
+    <ion-buttons slot="primary">
+      <ion-button (click)="cancelSubmitReport()">
+        <ion-icon slot="icon-only" name="close" style="color: white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title *ngIf="!order && reportCustomer" style="color: white">
+        Report User
+      </ion-title>
+      <ion-title *ngIf="!order && !reportCustomer" style="color: white">
+        Report Error
+      </ion-title>
+      <ion-title *ngIf="order" style="color: white">
+        Report Order #{{ order._id.substring(order._id.length - 5) }}
+      </ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <form
+          [formGroup]="reportForm"
+          enctype="multipart/form-data"
+          (ngSubmit)="submitReport()"
+        >
+          <ion-list>
+            <ion-item *ngIf="reportCustomer">
+              <ion-label>Select type of user</ion-label>
+              <ion-select
+                interface="popover"
+                (ionChange)="updateSelectedOption($event)"
+              >
+                <ion-select-option
+                  *ngIf="delivererDetails.length > 0"
+                  value="deliverer"
+                  >Order Deliverer</ion-select-option
+                >
+                <ion-select-option
+                  *ngIf="customerDetails.length > 0"
+                  value="customer"
+                  >Delivery Customer</ion-select-option
+                >
+              </ion-select>
+            </ion-item>
+            <span
+              *ngIf="reportCustomer && !formValid && !selectedOption"
+              style="color: #ee4444; padding-left: 1rem"
+              >Please select a user.</span
+            >
+
+            <ion-item *ngIf="reportCustomer">
+              <ion-label>Select user to report</ion-label>
+              <ion-button
+                fill="clear"
+                size="medium"
+                class="ion-text-wrap"
+                (click)="showUsersPicker()"
+                >{{
+                  selectedUserId ? displaySelectedUserName() : "Select"
+                }}</ion-button
+              >
+              <ion-icon name="caret-down-outline"></ion-icon>
+            </ion-item>
+            <span
+              *ngIf="reportCustomer && !formValid && !selectedUserId"
+              style="color: #ee4444; padding-left: 1rem"
+              >Please select a user.</span
+            >
+
+            <ion-item *ngIf="reportCustomer">
+              <ion-label>Select order</ion-label>
+              <ion-button
+                fill="clear"
+                size="medium"
+                class="ion-text-wrap"
+                (click)="showOrderPicker()"
+                >{{
+                  selectedOrderId ? displaySelectedOrderId() : "Select"
+                }}</ion-button
+              >
+              <ion-icon name="caret-down-outline"></ion-icon>
+            </ion-item>
+            <span
+              *ngIf="reportCustomer && !formValid && !selectedOrderId"
+              style="color: #ee4444; padding-left: 1rem"
+              >Please select an order.</span
+            >
+
+            <ion-item>
+              <ion-label>Select category</ion-label>
+              <ion-button
+                fill="clear"
+                size="medium"
+                class="ion-text-wrap"
+                (click)="showCategoryPicker()"
+                >{{
+                  category.value
+                    ? category.value?.replaceAll("_", " ")
+                    : "Select"
+                }}</ion-button
+              >
+              <ion-icon name="caret-down-outline"></ion-icon>
+            </ion-item>
+            <span
+              *ngIf="
+                category.errors?.required &&
+                (category.dirty || category.touched || !formValid)
+              "
+              style="color: #ee4444; padding-left: 1rem"
+              >Please select a category.</span
+            >
+
+            <ion-item>
+              <ion-label>Description</ion-label>
+              <ion-textarea
+                style="color: gray"
+                formControlName="description"
+                rows="20"
+                placeholder="Briefly describe the problem you are facing"
+              ></ion-textarea>
+            </ion-item>
+            <span
+              *ngIf="
+                description.errors?.required &&
+                (description.dirty || description.touched || !formValid)
+              "
+              style="color: #ee4444; padding-left: 1rem"
+              >Please provide a description.</span
+            >
+
+            <ion-item style="width: 100%" lines="none">
+              <ion-col>
+                <ion-row class="ion-align-items-center">
+                  <ion-label>Upload image</ion-label>
+                  <ion-row class="ion-justify-content-center">
+                    <ion-button
+                      style="color: white; padding-left: 5px"
+                      (click)="file.click()"
+                      >Upload</ion-button
+                    >
+                  </ion-row>
+                  <ion-row>
+                    <input
+                      class="ion-hide"
+                      name="file"
+                      #file
+                      type="file"
+                      accept="image/*"
+                      (change)="preview(file.files)"
+                    />
+                  </ion-row>
+                </ion-row>
+                <ion-row>
+                  <span
+                    *ngIf="!formValid && !imgURL"
+                    style="color: #ee4444; padding-left: 1rem"
+                    >Please include an image.</span
+                  >
+                </ion-row>
+                <ion-row style="display: flex; justify-content: center">
+                  <ion-img
+                    *ngIf="previewPic && imgURL"
+                    [src]="imgURL"
+                  ></ion-img>
+                </ion-row>
+                <ion-row class="ion-justify-content-center">
+                  <ion-button
+                    *ngIf="imgURL"
+                    (click)="removeImage()"
+                    color="danger"
+                    >Remove image</ion-button
+                  >
+                </ion-row>
+              </ion-col>
+            </ion-item>
+
+            <ion-row class="ion-justify-content-center">
+              <ion-button color="success" type="submit">
+                <ion-icon slot="start" name="checkmark"></ion-icon>
+                Submit Report
+              </ion-button>
+            </ion-row>
+          </ion-list>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

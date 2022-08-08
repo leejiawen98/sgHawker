@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center">
+      <ion-title style="color: white">Information</ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col class="ion-text-center">
+         <!-- <img src="./assets/leaderboard-info-img.png" style="width: 200px;" /> -->
+         <img src="./assets/sync-menu-info.png" style="width: 200px;" />
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <h5 style="text-decoration: underline; font-weight: bold; ">{{title}} of Master Outlet</h5>
+        <p> {{subtitle}} </p>
+        <p> {{description}} </p>
+        <p style="font-weight: bold; font-style:italic; color: #EE4444">Note: {{subdescription}}</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

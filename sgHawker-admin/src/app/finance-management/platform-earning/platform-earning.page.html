@@ -1,0 +1,200 @@
+<ion-content>
+  <ion-text>
+    <h4 style="margin: 20px">Platform Earning Transactions</h4>
+  </ion-text>
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row class="ion-justify-content-start" *ngIf="showCurrentBalance">
+          <ion-button
+            color="warning"
+            *ngIf="adminWallet"
+            style="margin-bottom: 2%"
+          >
+            <ion-icon slot="start" name="cash-outline"> </ion-icon>
+            Current Earning: {{adminWallet.balance | currency: "USD"}}
+          </ion-button>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <div *ngIf="showFilter">
+              <ion-row class="ion-align-items-center">
+                <ion-col size="2" style="margin-left: 20px; font-weight: bold">
+                  Transaction Category:
+                </ion-col>
+                <ion-col size="3">
+                  <ion-segment
+                    [value]="transactionCategory"
+                    (ionChange)="transactionCategoryChanged($event)"
+                  >
+                    <ion-segment-button value="ALL">
+                      <ion-label>All</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="CREDIT">
+                      <ion-label>Credit</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="DEBIT">
+                      <ion-label>Debit</ion-label>
+                    </ion-segment-button>
+                  </ion-segment>
+                </ion-col>
+                <ion-col size="8"></ion-col>
+              </ion-row>
+              <ion-row class="ion-align-items-center">
+                <ion-col size="2" style="margin-left: 20px; font-weight: bold">
+                  Transaction Type:
+                </ion-col>
+                <ion-col size="5">
+                  <ion-segment
+                    [value]="transactionType"
+                    (ionChange)="transactionTypeChanged($event)"
+                  >
+                    <ion-segment-button value="ALL">
+                      <ion-label>All</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="DELIVERY">
+                      <ion-label>Delivery</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="REFUND">
+                      <ion-label>Refund</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="SUBSCRIPTION_PAYMENT">
+                      <ion-label>Subscription payment</ion-label>
+                    </ion-segment-button>
+                  </ion-segment>
+                </ion-col>
+                <ion-col size="6"> </ion-col>
+              </ion-row>
+              <ion-row class="ion-align-items-center">
+                <ion-col size="2" style="margin-left: 20px; font-weight: bold">
+                  Transaction Date:
+                </ion-col>
+                <ion-col size="8">
+                  <ion-row>
+                    <ion-item style="width: 25%">
+                      <ion-label style="font-size: small; color: gray"
+                        >Start Date</ion-label
+                      >
+                      <ion-datetime [(ngModel)]="startDate"></ion-datetime>
+                    </ion-item>
+                    &nbsp;&nbsp;
+                    <ion-item style="width: 25%">
+                      <ion-label style="font-size: small; color: gray"
+                        >End Date</ion-label
+                      >
+                      <ion-datetime [(ngModel)]="endDate"></ion-datetime>
+                    </ion-item>
+                  </ion-row>
+                </ion-col>
+              </ion-row>
+              <br />
+              <ion-row>
+                <ion-col>
+                  <ion-button
+                    color="info"
+                    class="button-outline button-small"
+                    style="margin-left: 20px"
+                    (click)="filterRecords()"
+                  >
+                    <ion-icon slot="start" name="funnel"></ion-icon>
+                    Apply Filter
+                  </ion-button>
+                  <ion-button
+                    color="danger"
+                    class="button-has-icon-only button-small"
+                    (click)="resetAllFilters()"
+                  >
+                    <ion-icon slot="start" name="reload"></ion-icon>
+                    Reset All Filters
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+              <br />
+              <br />
+            </div>
+            <table
+              id="transaction-table"
+              *ngIf="adminWallet"
+              datatable="ng"
+              [dtOptions]="dtOptions"
+              class="row-border hover"
+              width="100%"
+            >
+              <thead>
+                <tr>
+                  <th>Transaction Date</th>
+                  <th>Transaction Category</th>
+                  <th>Transaction Type</th>
+                  <th>Debited Refund Amount</th>
+                  <th>Delivery Fee Commission</th>
+                  <th>Subscription Fee Payment</th>
+                  <th>Associated Order Number</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody style="text-align: center">
+                <tr *ngFor="let transaction of transactions">
+                  <td>
+                    <span *ngIf="transaction?.transactionDate">
+                      {{ transaction.transactionDate | date: "medium" }}
+                    </span>
+                    <span *ngIf="!transaction?.transactionDate"> - </span>
+                  </td>
+                  <td>
+                    <ion-badge
+                      color="success"
+                      *ngIf="transaction.transactionType === 'SUBSCRIPTION_PAYMENT' || transaction.transactionType === 'DELIVERY'"
+                    >
+                      CREDIT
+                    </ion-badge>
+                    <ion-badge
+                      color="danger"
+                      *ngIf="transaction.transactionType === 'REFUND'"
+                    >
+                      DEBIT
+                    </ion-badge>
+                  </td>
+                  <td>
+                    <ion-badge>
+                      {{transaction.transactionType.toString().replace("_", "
+                      ")}}
+                    </ion-badge>
+                  </td>
+                  <td>
+                    {{ transaction.refundedAmount ? (transaction.refundedAmount
+                    | currency: "USD") : "-" }}
+                  </td>
+                  <td>
+                    {{ transaction.deliveryCommission ?
+                    (transaction.deliveryCommission | currency: "USD") : "-" }}
+                  </td>
+                  <td>
+                    {{ transaction.paymentAmount ? (transaction.paymentAmount |
+                    currency: "USD") : "-" }}
+                  </td>
+                  <td>
+                    <!-- - -->
+                    <ion-text>
+                      {{ transaction.order ? "#" +
+                      transaction.order._id.substring(
+                      transaction.order._id.length - 5 ): "-" }}
+                    </ion-text>
+                  </td>
+                  <td>
+                    <ion-button
+                      class="button-outline button-small"
+                      [disabled]="!transaction.order"
+                      (click)="viewOrderDetails(transaction.order)"
+                    >
+                      View Order Details
+                    </ion-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

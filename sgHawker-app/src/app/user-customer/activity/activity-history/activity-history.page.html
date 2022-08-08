@@ -1,0 +1,136 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="redirectToOngoingOrders()">
+        <ion-icon slot="icon-only" name="close" style="color: white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="color: white"> Order History </ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="segmentModel" (ngModelChange)="toggleSegment()">
+      <ion-segment-button value="orders" class="segment-active-inactive">
+        Completed Orders
+      </ion-segment-button>
+      <ion-segment-button value="deliveries" class="segment-active-inactive">
+        Completed Deliveries
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-button
+          class="button-block button-outline button-small"
+          (click)="toggleAccordion()"
+        >
+          <ion-icon slot="start" name="funnel-outline"></ion-icon>
+          Toggle Filter
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="expanded">
+      <ion-col>
+        <ion-card>
+          <ion-card-content #filterDetails>
+            <ion-list lines="none">
+              <ion-item>
+                <ion-label>Start Date</ion-label>
+                <ion-datetime [(ngModel)]="filterStartDate"></ion-datetime>
+              </ion-item>
+              <ion-item>
+                <ion-label> End Date </ion-label>
+                <ion-datetime [(ngModel)]="filterEndDate"></ion-datetime>
+              </ion-item>
+              <ion-item>
+                <ion-label> Outlet </ion-label>
+                <ion-select multiple="true" [(ngModel)]="selectedOutlets">
+                  <ion-select-option
+                    *ngFor="let outlet of allOutlets"
+                    [value]="outlet"
+                    >{{outlet}}</ion-select-option
+                  >
+                </ion-select>
+              </ion-item>
+            </ion-list>
+            <ion-row class="ion-justify-content-center ion-align-items-center">
+              <ion-button
+                class="button-small"
+                color="success"
+                (click)="filter()"
+              >
+                <ion-icon name="checkmark-outline" slot="start"> </ion-icon>
+                Filter
+              </ion-button>
+              &nbsp;
+              <ion-button
+                class="button-small"
+                color="danger"
+                (click)="resetFilter()"
+              >
+                <ion-icon name="refresh-outline" slot="start"> </ion-icon>
+                Reset
+              </ion-button>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <div *ngIf="segmentModel === 'deliveries' && orders.length <= 0">
+      <ion-row class="ion-justify-content-center" style="margin-top: 50%">
+        <ion-text>
+          <ion-icon
+            name="bicycle-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text style="color: gray"> No delivery orders accepted </ion-text>
+      </ion-row>
+    </div>
+
+    <div *ngIf="segmentModel === 'orders' && orders.length <= 0">
+      <ion-row class="ion-justify-content-center" style="margin-top: 50%">
+        <ion-text>
+          <ion-icon
+            name="fast-food-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text style="color: gray"> No orders made </ion-text>
+      </ion-row>
+    </div>
+
+    <div *ngIf="segmentModel === 'orders'">
+      <ion-row *ngFor="let order of orders">
+        <app-order-summary
+          [order]="order"
+          [orderView]="'customer'"
+          (click)="showOrderDetails(order)"
+          style="width: 100%"
+        >
+        </app-order-summary>
+      </ion-row>
+    </div>
+    <div *ngIf="segmentModel === 'deliveries'">
+      <ion-row *ngFor="let order of orders">
+        <app-order-summary
+          [order]="order"
+          [orderView]="'deliverer'"
+          (click)="showDeliveryOrderDetails(order)"
+          style="width: 100%"
+        >
+        </app-order-summary>
+      </ion-row>
+    </div>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,31 @@
+<ion-card style="width: 170px;">
+  <div style="display: flex; flex-direction: column">
+    <img
+      src="../../../assets/sgHawkerAppIcon.svg"
+      style="height: 150px; width: 150px"
+    />
+  </div>
+
+  <ion-item lines="none">
+    <div style="display: flex; flex-direction: column">
+      <ion-label style="font-weight: bold; font-size: medium">{{ recommendedOrder.outlet.outletName }}</ion-label>
+      <ion-label *ngIf="!fromOutletPage" style="font-size: medium">
+        {{ recommendedOrder.outlet.hawkerCentreName }}
+      </ion-label>
+      <br />
+      <ion-label
+        class="ion-text-wrap"
+        style="font-size: small; color: gray; text-overflow: ellipsis"
+      >
+        {{ recommendedOrder.outlet.outletAddress }}
+      </ion-label>
+      <ion-label
+        class="ion-text-wrap"
+        style="font-size: small; color: gray; text-overflow: ellipsis"
+        *ngIf="fromOutletPage"
+      >
+        {{ recommendedOrder.deliveryFee | currency: "USD" }}
+      </ion-label>
+    </div>
+  </ion-item>
+</ion-card>

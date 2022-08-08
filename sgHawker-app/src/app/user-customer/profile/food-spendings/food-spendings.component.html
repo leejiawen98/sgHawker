@@ -1,0 +1,211 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close" style="color: white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="color: white;">
+        Food Spendings
+      </ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header> 
+
+<ion-content fullscreen>
+  <br>
+  <ion-row>
+    <ion-card style = "width: 100%;">
+    <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        <ion-card-content>
+        <ion-row class="ion-align-items-center">
+          <ion-card-title>
+            Budget Goal (Month)
+          </ion-card-title>
+        </ion-row>
+        <br>
+        <ion-row>
+          <ion-card-content *ngIf="currentBudgetGoal===undefined">
+            <ion-grid style="margin-top: -25px">
+              <ion-row>
+                <ion-col class="ion-text-center">
+                  <img src="../../../assets/no-data-found.svg" />
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <!-- <ion-col class="ion-text-center">
+                  <h1>No Current Budget Goal</h1>
+                </ion-col> -->
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        <ion-card-title class="ion-text-center" *ngIf="currentBudgetGoal===undefined">
+          No Current Budget Goal
+        </ion-card-title>
+        <ion-col *ngIf="currentBudgetGoal!==undefined"> 
+          <div class="positionRelative"> 
+            <round-progress style="margin: 0px auto" [current]="this.tempTotalSpendings"
+              [max]="this.currentBudgetGoal" [animation]="'easeInOutQuart'" [color] = "this.tempTotalSpendings <= this.currentBudgetGoal? '#45ce50' : '#eb1a1a'"
+              [radius]='60'></round-progress>
+            <div class="percentageValue" *ngIf="this.tempTotalSpendings < this.currentBudgetGoal">
+              {{ ((this.tempTotalSpendings / this.currentBudgetGoal) * 100).toFixed(2) }}%
+            </div>
+            <div class="percentageValue" *ngIf="this.tempTotalSpendings === this.currentBudgetGoal">
+              100%
+            </div>
+            <div class="percentageValue" *ngIf="this.tempTotalSpendings > this.currentBudgetGoal">
+              Oh No!
+            </div>
+          </div>
+        </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col *ngIf="currentBudgetGoal!==undefined">
+            <div style="text-align: center; font-size: x-large;" *ngIf="this.tempTotalSpendings < this.currentBudgetGoal"><b>
+              ${{this.tempTotalSpendings.toFixed(2)}} / ${{this.currentBudgetGoal.toFixed(2)}}</b>
+            </div>
+            <div  style="text-align: center; font-size: x-large;" *ngIf="this.tempTotalSpendings === this.currentBudgetGoal"><b>
+              ${{this.tempTotalSpendings.toFixed(2)}} / ${{this.currentBudgetGoal.toFixed(2)}}</b>
+            </div>
+            <div  style="text-align: center; font-size: x-large;" *ngIf="this.tempTotalSpendings > this.currentBudgetGoal"><b>
+              U Have Exceeded Your Budget Goal :( </b>
+            </div>
+
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-col>
+      </ion-row>
+    </ion-grid>
+    </ion-card>
+  
+    <ion-card style="width: 100%;">
+      <ion-grid>
+        <ion-row class="ion-align-items-center">
+          <ion-col size = "9">
+          <ion-card-title>
+            Food Spendings
+          </ion-card-title>
+        </ion-col>
+        <ion-col size = "1" style="margin-left: 10%;">
+          <ion-button class="button-has-icon-only" fill="clear" (click)="dateSelect.open()">
+            <ion-icon name="filter"> </ion-icon>
+          </ion-button>
+          <ion-select [(ngModel)]="foodSpendingFilter" #dateSelect class="ion-hide" (ionChange)="filterFoodSpending();"
+            >
+            <ion-select-option value="day">Today</ion-select-option>
+          <ion-select-option value="week">This Week</ion-select-option>
+          <ion-select-option value="month">This Month</ion-select-option>
+          </ion-select>
+        </ion-col>
+        </ion-row>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+        <ion-card-content>
+          <br>
+            <!-- <canvas baseChart 
+              [data]="completedSelfOrdersData" 
+              [labels]="chartLabels" 
+              [chartType]="chartType"
+              >
+            </canvas> -->
+            <div echarts [options]="chartOption"></div>
+        </ion-card-content>
+    </ion-col>
+    </ion-row>
+    </ion-grid>
+  </ion-card>
+  <ion-card style = "width: 100%;">
+    <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        <ion-card-content>
+        <ion-row class="ion-align-items-center">
+          <ion-card-title>
+            Your Spendings vs Last Month
+          </ion-card-title>
+        </ion-row>
+        <br>
+        <ion-row>
+          <ion-col>
+            <ion-row *ngIf = "checkMonthlyPercentage()">
+            <ion-badge style ="font-size: xx-large;" color="success">{{this.monthlyComparisonPercentage}}</ion-badge>
+            </ion-row>
+            <ion-row *ngIf = "!checkMonthlyPercentage()">
+              <ion-badge style ="font-size: xx-large;" color="danger">{{this.monthlyComparisonPercentage}}</ion-badge>
+              </ion-row>
+            <br>
+            <p>
+              <b>This Month's Spendings: ${{this.currentMonthSpendings.toFixed(2)}}</b>
+            </p> 
+            <br>
+            <p><b>
+              Last Month's Spendings: ${{this.previousMonthSpendings.toFixed(2)}}</b>
+            </p>
+
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-col>
+      </ion-row>
+    </ion-grid>
+    </ion-card>
+  <ion-card style = "width: 100%;">
+    <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        <ion-card-content>
+        <ion-row class="ion-align-items-center">
+          <ion-card-title>
+            Set Budget Goal for Next Month
+          </ion-card-title>
+        </ion-row>
+        <br>
+        <ion-row>
+          <form [formGroup]="goalForm" (ngSubmit)="updateDetails()">
+            <ion-grid style="padding: 1rem">
+          
+              <ion-row>
+                <ion-col size="12">
+                  <ion-item>
+                    <ion-label position="stacked">Budget Goal For Next Month</ion-label>
+                    <ion-input formControlName="futureBudgetGoal" type="text" (ngModelChange)="checkFormValid()"
+                    [placeholder]="futureBudgetGoal!== undefined ? futureBudgetGoal: 'Enter Your Goal'"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+        
+                </ion-col>
+                <ion-col size="12">
+                  <span *ngIf="formSubmitted && errorControl.futureBudgetGoal.errors?.required" style="color: #ee4444; padding-left: 1rem">
+                    Please type a number.</span>
+                </ion-col>
+              </ion-row>
+              <br />
+              <br />
+              <div style="display: flex; justify-content: center;">
+                <ion-row>
+                  <ion-col>
+                    <ion-button color="primary" type="submit" [class.button-disabled]="!formValid">
+                      Update Budget Goal
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </div>
+            </ion-grid>
+          </form>
+        </ion-row>
+      </ion-card-content>
+    </ion-col>
+      </ion-row>
+    </ion-grid>
+    </ion-card>
+  
+  </ion-row>
+
+</ion-content>

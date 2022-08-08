@@ -1,0 +1,16 @@
+ion-grid {
+  ion-input, ion-datetime, ion-select {
+    background-color:#f9f9f9;
+    --padding-start: 12px;
+    border-radius: 12px;
+    border: 1px solid #b2b2b2;
+  }
+}
+
+.dot {
+  height: 33px;
+  width: 33px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid black;
+}

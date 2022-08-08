@@ -1,0 +1,40 @@
+<ion-card>
+  <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        <ion-row class="ion-justify-content-between ion-align-items-center">
+          <ion-card-title style="font-family: bold; color: var(--font-color)">
+            {{ pendingDeliveryOrder.outlet.outletName }}
+          </ion-card-title>
+        </ion-row>
+        <ion-row class="ion-align-items-center">
+          <ion-icon name="location-outline" style="color: coral"></ion-icon>
+          <span style="padding-left: 2px; font-size: medium">{{
+            pendingDeliveryOrder.outlet.hawkerCentreName
+          }}</span>
+        </ion-row>
+        <br />
+        <ion-row class="ion-align-items-center">
+          <!-- <ion-icon name="walk-outline" style="color: coral"></ion-icon> -->
+          <ion-icon name="home-outline" style="color: coral"></ion-icon>
+          <span style="padding-left: 2px; font-size: small">Address</span>
+        </ion-row>
+        <ion-row class="ion-align-items-center">
+          <ion-icon name="cash-outline" style="color: coral"></ion-icon>
+          <span style="padding-left: 2px; font-size: small;">{{ pendingDeliveryOrder.deliveryFee | currency: "USD" }}</span>
+        </ion-row>
+
+        <br />
+        <ion-row class="ion-align-items-center">
+          <ion-badge
+            color="warning"
+            *ngFor="let type of pendingDeliveryOrder.outlet.cuisineType"
+            style="font-size: x-small; margin: 3px"
+          >
+            {{ type }}
+          </ion-badge>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-card>

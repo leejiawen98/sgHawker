@@ -1,0 +1,165 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/customer/activity" style="color:white;"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="presentPopover($event)">
+        <ion-icon
+          slot="icon-only"
+          ios="ellipsis-horizontal"
+          md="ellipsis-vertical"
+          style="color: white"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <ion-grid>
+        <ion-row class="ion-align-items-end ion-justify-content-center">
+          <ion-title style="color: white;">
+            Basket
+          </ion-title>
+        </ion-row>
+      </ion-grid>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="order.individualOrderItems.length + order.foodBundleOrderItems.length <= 0"
+    class="ion-padding" style="width: 100%; text-align: center;" >
+    <ion-text>
+      You do not have any food item in the cart.
+    </ion-text>
+  </div>
+
+  <ion-card *ngFor="let foodItem of order?.individualOrderItems; let id = index">
+    <app-cart-individual-order-item [foodItem]="foodItem" [user]="user" [id]="id">
+    </app-cart-individual-order-item>
+  </ion-card>
+
+  <ion-card *ngFor="let bundleItem of order?.foodBundleOrderItems; let id = index">
+    <app-cart-bundle-order-item [bundleItem]="bundleItem" [user]="user" [id]="id">
+    </app-cart-bundle-order-item>
+  </ion-card>
+
+  <div class="ion-padding-horizontal">
+    <div *ngIf="order.individualOrderItems.length + order.foodBundleOrderItems.length > 0">
+      <ion-item>
+        <ion-label>Dining Options</ion-label>
+        <ion-select interface="popover" placeholder="Select One" (ionChange)="updateDiningOptions($event)">
+          <ion-select-option value="DINE_IN">Dine In</ion-select-option>
+          <ion-select-option value="TAKE_AWAY">Takeaway</ion-select-option>
+          <ion-select-option *ngIf="user" value="DELIVERY">Delivery</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngIf="(diningOptions === 'DELIVERY' || diningOptions === 'TAKE_AWAY') && user">
+        <ion-label>Advanced Order</ion-label>
+        <ion-toggle [disabled]="diningOptions === 'DELIVERY'" [(ngModel)]="advancedOrder"></ion-toggle>
+      </ion-item>
+
+      <ion-item *ngIf="(diningOptions === 'DELIVERY' || diningOptions === 'TAKE_AWAY') && advancedOrder">
+        <ion-label *ngIf="diningOptions === 'DELIVERY'">Delivery pickup time</ion-label>
+        <ion-label *ngIf="diningOptions === 'TAKE_AWAY'">Takeaway time</ion-label>
+        <ion-datetime display-format="HH:mm" picker-format="HH:mm" value="currentTime" [(ngModel)]="selectedTime"
+          minuteValues="0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55"
+          >
+        </ion-datetime>
+      </ion-item>
+    </div>
+
+    <div>
+      <ion-item *ngIf="diningOptions === 'DELIVERY'">
+        <ion-label>Select Delivery Address</ion-label>
+        <ion-select [(ngModel)]="selectedAddress">
+          <ion-select-option *ngFor="let address of allUserAddresses" [value]="address">{{address.addressDetails}}
+            <ion-label>S{{address.postalCode}}</ion-label>
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+
+    <div>
+      <ion-item *ngIf="diningOptions === 'DELIVERY'">
+        <ion-label>Set Delivery Fee</ion-label>
+        <ion-input style="text-align: right;" type="number" inputmode="numeric" (ionChange)="updateTotalOrderPrice($event)"></ion-input>
+      </ion-item>
+    </div>
+
+    <div *ngIf="order.individualOrderItems.length + order.foodBundleOrderItems.length > 0">
+      <ion-item>
+        <ion-label>Payment Option</ion-label>
+        <ion-select *ngIf="user" interface="popover" placeholder="Select One" [(ngModel)]="selectedPaymentType"
+          [interfaceOptions]="{'cssClass': 'ion-select-style'}" class="payment-option-style">
+          <ion-select-option value="CASH" *ngIf="diningOptions === 'DINE_IN'">Cash</ion-select-option>
+          <ion-select-option value="DIGITAL">Digital Wallet ({{ wallet.balance | currency: "USD"}})</ion-select-option>
+        </ion-select>
+        <ion-note *ngIf="!user" slot="end">CASH</ion-note>
+      </ion-item>
+    </div>
+
+    <div *ngIf="user && selectedPaymentType === 'DIGITAL' && cashback !== 0 && outlet.cashbackIsActive === true">
+      <ion-item>
+        <ion-label>Cashback</ion-label>
+        <ion-badge>{{ cashback * 100 }}% cashback </ion-badge>
+      </ion-item>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-padding-horizontal"
+  *ngIf="order.individualOrderItems.length + order.foodBundleOrderItems.length > 0">
+  <div
+    *ngIf="order.individualOrderItems.length + order.foodBundleOrderItems.length > 0 && selectedPaymentType === 'DIGITAL' && cashback !== 0 && outlet.cashbackIsActive === true">
+    <ion-grid>
+      <ion-row class="ion-justify-content-between ion-padding-horizontal">
+        <ion-label>
+          <ion-icon name="gift-outline"></ion-icon> You will earn  {{
+          foodBasketService.computeCreditedCashback(outlet.cashbackRate, outlet.cashbackIsActive, selectedPaymentType) | currency: "USD" }},
+          valid for next purchase
+        </ion-label>
+      </ion-row>
+    </ion-grid>
+  </div>
+  <br />
+  <div *ngIf="order.individualOrderItems.length + order.foodBundleOrderItems.length > 0">
+    <ion-grid>
+      <ion-row class="ion-justify-content-between ion-padding-horizontal" *ngIf="selectedPaymentType === 'DIGITAL'">
+        <ion-text>Subtotal</ion-text>
+        <ion-text>{{ order.totalPrice | currency: "USD"}}</ion-text>
+      </ion-row>
+      <!-- <ion-row *ngIf="selectedPaymentType === 'DIGITAL'">&nbsp;</ion-row> -->
+      <ion-row class="ion-justify-content-between ion-padding-horizontal ion-align-items-center" *ngIf="selectedPaymentType === 'DIGITAL'">
+        <ion-text>Cashback Used</ion-text>
+        <ion-text *ngIf="availableCashback" style="color:red">- {{ foodBasketService.getDebitedCashback() | currency: "USD"}}</ion-text>
+        <ion-text *ngIf="!availableCashback"> 0.00</ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-between ion-padding-horizontal ion-align-items-center" *ngIf="diningOptions === 'DELIVERY' && selectedDeliveryFee >= 1">
+        <ion-text>Delivery Fee</ion-text>
+        <ion-text>{{ selectedDeliveryFee | currency: "USD"}}</ion-text>
+      </ion-row>
+      <ion-row class="ion-padding-horizontal" *ngIf="diningOptions === 'DELIVERY' && selectedDeliveryFee >= 1">
+        <ion-text style="font-size: x-small; font-style: italic;">Delivery fee is inclusive of {{ selectedDeliveryFee * 0.1 | currency: "USD" }} platform commission.
+          The deliverer will receive {{ selectedDeliveryFee * 0.9 | currency: "USD" }}.</ion-text>
+      </ion-row>
+      <ion-row class="ion-padding-horizontal" *ngIf="diningOptions === 'DELIVERY' && selectedDeliveryFee < 1">
+        <ion-text style="font-size: x-small; font-style: italic; color: red;">Minimum delivery fee is $1.</ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-between ion-padding-horizontal ion-align-items-center">
+        <ion-text>
+          <h4>Total Payable</h4>
+        </ion-text>
+        <ion-text *ngIf="diningOptions === 'DELIVERY'">
+          <h4 *ngIf="selectedDeliveryFee >= 1">{{ foodBasketService.computeTotalPayable(selectedPaymentType) + selectedDeliveryFee | currency: "USD"}}</h4>
+          <h4 *ngIf="selectedDeliveryFee === undefined || selectedDeliveryFee < 1">{{ foodBasketService.computeTotalPayable(selectedPaymentType) | currency: "USD"}}</h4>
+        </ion-text>
+        <ion-text *ngIf="diningOptions !== 'DELIVERY'">
+          <h4>{{ foodBasketService.computeTotalPayable(selectedPaymentType) | currency: "USD"}}</h4>
+        </ion-text>
+      </ion-row>
+    </ion-grid>
+    <ion-button horizontal="end" vertical="bottom" expand="block" color="success" (click)="placeOrder()">Place Order
+    </ion-button>
+  </div>
+</ion-footer>

@@ -1,0 +1,67 @@
+<br />
+<ion-row
+  class="ion-justify-content-end ion-align-items-center"
+  *ngIf="hasData"
+>
+  <ion-col class="ion-text-start" *ngIf="chartType === 'LINE'">
+    <div class="info-box">
+      <ion-icon name="information-circle" style="color: rgb(126, 126, 126); font-size: 1.5rem;"></ion-icon>
+      <span style="font-size: 1rem; padding-left: 0.5rem;">
+        Value '0' in chart indicates no sales for the day
+      </span>
+    </div> 
+  </ion-col>
+  <ion-col class="ion-text-end" *ngIf="showThreshold">
+    <ion-label>{{ sliderTitle }}</ion-label>
+  </ion-col>
+  <ion-col size="3" class="ion-text-end" *ngIf="showThreshold">
+    <ion-range
+      style="padding-top: 8px"
+      min="0"
+      max="{{ maxThreshold }}"
+      pin="true"
+      name=""
+      [(ngModel)]="threshold"
+      (ionChange)="onThresholdChange()"
+    >
+      <ion-label slot="start">0</ion-label>
+      <ion-label slot="end">{{ maxThreshold }}</ion-label>
+    </ion-range>
+  </ion-col>
+</ion-row>
+<ion-row class="ion-justify-content-end" *ngIf="showThreshold && hasData">
+  <ion-col class="ion-text-end">
+    <ion-label>
+      {{ thresholdTitle }}
+    </ion-label>
+  </ion-col>
+  <ion-col size="3" class="ion-text-start ion-no-padding">
+    <ion-badge
+      mode="ios"
+      style="margin-right: 2px"
+      color="danger"
+      *ngFor="let item of belowThresholdItems"
+    >
+      {{ item }}
+    </ion-badge>
+  </ion-col>
+</ion-row>
+<br />
+<ion-row
+  class="ion-justify-content-center"
+  style="color: darkgray; font-weight: bold; font-size: medium"
+>
+  {{ chartTitle }}
+</ion-row>
+<div class="chart-wrapper">
+  <div *ngIf="!hasData" class="demo-chart noData">
+    <img src="../../../../assets/no-data-found.svg" height="65%" width="auto"/>
+  </div>
+  <div *ngIf="hasData"
+    echarts
+    [options]="options"
+    [merge]="updateOptions"
+    class="demo-chart"
+  ></div>
+</div>
+<br />

@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/customer/profile"
+        style="color: white"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title style="color: white"> Vaccination Record </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-no-border">
+  <ion-grid>
+    <div *ngIf="user.isVaccinated">
+      <ion-row class="ion-justify-content-center">
+        <img src="../../../../assets/vaccination-needle.jpeg" />
+        <ion-text style="font-size: large; font-weight: bold; color: darkcyan"
+          >You are vaccinated!</ion-text
+        >
+      </ion-row>
+      <br />
+    </div>
+    <ion-row class="ion-justify-content-center">
+      <ion-button (click)="file.click()" class="button-outline">
+        <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+        Upload Vaccination Certificate
+      </ion-button>
+    </ion-row>
+    <div *ngIf="previewPic && imgURL">
+      <ion-row>
+        <ion-img [src]="imgURL"></ion-img>
+      </ion-row>
+      <ion-row class="ion-align-items-center ion-justify-content-center">
+        <ion-button (click)="upload()" color="success">
+          <ion-icon name="trash-bin-outline" slot="start"></ion-icon>
+          Upload
+        </ion-button>
+        <ion-button (click)="removeImage()" color="danger">
+          <ion-icon name="trash-bin-outline" slot="start"></ion-icon>
+          Remove
+        </ion-button>
+      </ion-row>
+    </div>
+
+    <ion-row>
+      <input
+        class="ion-hide"
+        name="file"
+        #file
+        type="file"
+        accept="image/*,.doc, .docx,.txt,.pdf"
+        (change)="preview(file.files)"
+      />
+    </ion-row>
+  </ion-grid>
+</ion-content>

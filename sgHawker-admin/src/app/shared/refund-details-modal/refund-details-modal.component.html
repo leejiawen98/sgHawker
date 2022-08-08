@@ -1,0 +1,147 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="text-transform: capitalize"
+        >Refund For Order #{{
+          this.order._id.substring(this.order._id.length - 5)
+        }}</ion-title
+      >
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="borderless-ion-card">
+          <ion-list lines="none" style="padding: 0 !important">
+            <ion-item>
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Debited cashback:
+              </ion-label>
+              <ion-text>
+                {{ order.debitedCashback | currency: "USD" }}
+              </ion-text>
+            </ion-item>
+            <ion-item style="border-bottom: 1px solid black">
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Paid non-cashback total:
+              </ion-label>
+              <ion-text>
+                {{ order.totalPrice | currency: "USD" }}
+              </ion-text>
+            </ion-item>
+            <ion-item>
+              <ion-label style="font-weight: bold; font-size: large">
+                Maximum refund amount:
+              </ion-label>
+              <ion-text>
+                {{ maxRefundAmount | currency: "USD" }}
+              </ion-text>
+            </ion-item>
+            <ion-item>
+              <ion-label style="font-weight: bold; font-size: large">
+                Full refund:
+              </ion-label>
+              <ion-select
+                [(ngModel)]="fullRefund"
+                (ngModelChange)="fullRefundChange()"
+                required
+              >
+                <ion-select-option value="true"> Yes </ion-select-option>
+                <ion-select-option value="false"> No </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label style="font-weight: bold; font-size: large">
+                Partial refund amount:
+              </ion-label>
+              <ion-input
+                type="number"
+                [(ngModel)]="partialRefundAmount"
+                (ngModelChange)="partialRefundAmountChange()"
+                [disabled]="fullRefund === undefined || fullRefund"
+              >
+              </ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label style="font-weight: bold; font-size: large">
+                Select source wallet for refund:
+              </ion-label>
+              <ion-select
+                [(ngModel)]="fromWallet"
+                (ngModelChange)="fromWalletOnChange()"
+                [disabled]="toWallet !== undefined"
+                required
+              >
+                <ion-select-option
+                  *ngFor="let wallet of wallets"
+                  [value]="wallet"
+                >
+                  {{
+                    wallet.user !== undefined
+                      ? wallet.user.name
+                      : wallet.outlet.outletName
+                  }}&nbsp;&nbsp;({{ wallet.balance | currency: "USD" }})
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label style="font-weight: bold; font-size: large">
+                Select target wallet for refund:
+              </ion-label>
+              <ion-select
+                [(ngModel)]="toWallet"
+                [disabled]="fromWallet === undefined"
+                required
+              >
+                <ion-select-option
+                  *ngFor="let wallet of toWalletArr"
+                  [value]="wallet"
+                >
+                  {{
+                    wallet.user !== undefined
+                      ? wallet.user.name
+                      : wallet.outlet.outletName
+                  }}&nbsp;&nbsp;({{ wallet.balance | currency: "USD" }})
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-list>
+          <br />
+          <ion-row class="ion-align-items-center ion-justify-content-center">
+            <ion-button
+              color="danger"
+              class="button-has-icon-only button-small"
+              (click)="resetSelections()"
+              style="margin-left: auto"
+              [disabled]="fromWallet === undefined && toWallet === undefined"
+            >
+              <ion-icon slot="start" name="reload"></ion-icon>
+              Reset Selections
+            </ion-button>
+            &nbsp;&nbsp;
+            <ion-button
+              (click)="processRefund()"
+              class="button-small"
+              color="success"
+            >
+              <ion-icon name="checkmark-outline" slot="start"> </ion-icon>
+              Confirm Refund
+            </ion-button>
+          </ion-row>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

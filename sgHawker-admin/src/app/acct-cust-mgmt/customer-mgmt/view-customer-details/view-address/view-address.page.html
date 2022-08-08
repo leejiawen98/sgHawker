@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title *ngIf="readOnly">View Address</ion-title>
+    <ion-title *ngIf="!readOnly">Edit Address</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="dismissModal()" style="font-size: 20px" fill="clear">
+        <ion-icon style="color: white" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row *ngFor="let address of addresses; let i = index">
+      <ion-card style="width: 100%">
+        <ion-col>
+          <ion-item lines="none" style="margin-top: -10px">
+            <ion-card-subtitle>Address {{i + 1}}</ion-card-subtitle>
+            <ion-badge *ngIf="address.isDefault" slot="end" color="danger"
+              >Default</ion-badge
+            >
+          </ion-item>
+          <ion-card-content>
+            <ion-item>
+              <ion-label>Address Details:</ion-label>
+              <ion-input
+                class="ion-text-right"
+                [readonly]="readOnly"
+                type="text"
+                [(ngModel)]="address.addressDetails"
+              ></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label>Postal Code:</ion-label>
+              <ion-input
+                class="ion-text-right"
+                [readonly]="readOnly"
+                type="text"
+                [(ngModel)]="address.postalCode"
+              ></ion-input>
+            </ion-item>
+          </ion-card-content>
+        </ion-col>
+      </ion-card>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<ion-footer *ngIf="!readOnly">
+  <ion-button
+    color="success"
+    (click)="saveAddress()"
+    style="width: 100%"
+    expand="block"
+    fill="solid"
+    >Confirm Edit</ion-button
+  >
+</ion-footer>

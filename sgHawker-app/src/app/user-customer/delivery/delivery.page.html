@@ -1,0 +1,180 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-title>
+      <ion-row
+        class="ion-align-items-end ion-justify-content-center"
+        style="color: white"
+      >
+        Delivery Requests
+      </ion-row>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col size="9">
+        <ion-searchbar
+          (ionChange)="searchData($event)"
+          placeholder="Search hawker centres with delivery"
+        >
+        </ion-searchbar>
+      </ion-col>
+      <ion-col size="1">
+        <ion-button
+          class="button-has-icon-only"
+          fill="clear"
+          (click)="categorySelect.open()"
+        >
+          <ion-icon name="funnel-outline"> </ion-icon>
+        </ion-button>
+        <ion-select
+          [(ngModel)]="selectedCategories"
+          #categorySelect
+          class="ion-hide"
+          (ionChange)="filterCategories();"
+          multiple="true"
+        >
+          <ion-select-option
+            *ngFor="let category of allCategories"
+            [value]="category"
+            >{{category}}
+          </ion-select-option>
+        </ion-select>
+      </ion-col>
+      <ion-col size="1">
+        <ion-button
+          class="button-has-icon-only"
+          fill="clear"
+          (click)="sortCategorySelect.open()"
+        >
+          <ion-icon name="filter"> </ion-icon>
+        </ion-button>
+        <ion-select
+          [(ngModel)]="selectedSortCategory"
+          #sortCategorySelect
+          class="ion-hide"
+          (ionChange)="sortList();"
+        >
+          <ion-select-option
+            *ngFor="let item of allSortCategories"
+            [value]="item"
+            >{{item}}
+          </ion-select-option>
+        </ion-select>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <div *ngIf="recommendedDeliveryOrders?.length > 0">
+    <ion-row>
+      <ion-col>
+        <ion-card class="borderless-ion-card header">
+          <ion-card-title> Pick These Up! </ion-card-title>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-slides
+          [options]="{ slidesPerView: 'auto', zoom: false, grabCursor: true }"
+        >
+          <app-recommended-delivery-card
+            *ngFor="let order of recommendedDeliveryOrders"
+            [recommendedOrder]="order"
+            (click)="openDeliveryOrderDetails(order)"
+          ></app-recommended-delivery-card>
+        </ion-slides>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-justify-content-end ion-align-items-center">
+      <ion-text
+        style="color: gray; margin-right: 8%"
+        (click)="showAllRecommended()"
+      >
+        See all
+      </ion-text>
+    </ion-row>
+  </div>
+
+  <div>
+    <ion-row>
+      <ion-col>
+        <ion-card class="borderless-ion-card header">
+          <ion-card-title> Hawker Centers </ion-card-title>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <div *ngIf="deliveryHawkerCenters?.length === 0">
+      <ion-row class="ion-justify-content-center">
+        <ion-text>
+          <ion-icon
+            name="sad-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text *ngIf="noFilterResults" style="color: gray">
+          No orders based on your filter options
+        </ion-text>
+        <ion-text
+          *ngIf="!noFilterResults && noSearchResults"
+          style="color: gray"
+        >
+          No orders matching your search
+        </ion-text>
+        <ion-text
+          *ngIf="!noFilterResults && !noSearchResults"
+          style="color: gray"
+        >
+          There are no deliveries currently.
+        </ion-text>
+      </ion-row>
+    </div>
+
+    <ion-row *ngIf="deliveryHawkerCenters?.length > 0">
+      <ion-card
+        style="width: 100%; margin: 5px 16px"
+        *ngFor="let hawkerCenter of deliveryHawkerCenters; let id = index"
+        (click)="navigateToHawkerCenter(hawkerCenter)"
+      >
+        <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <ion-col>
+              <ion-row
+                class="ion-justify-content-between ion-align-items-center"
+              >
+                <ion-card-title
+                  style="font-family: bold; color: var(--font-color)"
+                >
+                  {{hawkerCenter.hawkerCenterName}}
+                </ion-card-title>
+              </ion-row>
+              <br />
+              <ion-row class="ion-align-items-center">
+                <ion-icon name="walk-outline" style="color: coral"></ion-icon>
+                <span class="storeNumber"
+                  >{{hawkerCenter.orders.length}} available delivery
+                  orders</span
+                >
+              </ion-row>
+              <br />
+              <ion-row class="ion-align-items-center">
+                <ion-badge
+                  color="warning"
+                  *ngFor="let type of hawkerCenter.cuisineTypes"
+                  style="font-size: x-small; margin: 3px"
+                >
+                  {{type}}
+                </ion-badge>
+              </ion-row>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card>
+    </ion-row>
+  </div>
+</ion-content>

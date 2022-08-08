@@ -1,0 +1,80 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-title>Edit {{ content }} Target</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click) = "dismissModal()"style="font-size: 15px;" fill="clear">
+        <ion-icon style='color: white;'name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <img
+        style="width: 50; height: 50; display: block; margin: 0 auto"
+        src="../../../assets/edit-goal.png"
+      />
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none" style="--background-hover: #ffffff">
+          <ion-label position="stacked">Period</ion-label>
+          <ion-select style='margin-top: 7px;'placeholder="--SELECT PERIOD--" [(ngModel)]="goal.goalPeriod">
+            <ion-select-option
+            *ngFor="let period of periodSelections"
+            [value]="period.value"
+            >{{period.label}}
+          </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="goal.goalPeriod === 'TARGETED'">
+      <ion-col>
+        <ion-row>
+          <ion-col style="margin-left: -5px;">
+            <ion-item lines="none" style="--background-hover: #ffffff">
+              <ion-label position="stacked">Start Date</ion-label>
+              <ion-datetime  style='margin-top: 7px;'
+              displayFormat="MM/DD/YYYY"
+              [max]="maxDate"
+              [(ngModel)]="goal.goalStartDate">
+            </ion-datetime>
+            </ion-item>
+          </ion-col>
+          <ion-col style="margin-right: -5px;">
+            <ion-item lines="none" style="--background-hover: #ffffff">
+              <ion-label position="stacked">End Date</ion-label>
+              <ion-datetime  style='margin-top: 7px;'
+              displayFormat="MM/DD/YYYY"
+              [max]="maxDate"
+              [(ngModel)]="goal.goalEndDate"></ion-datetime>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none">
+          <ion-label position="stacked">Target Amount:</ion-label>
+          <ion-input  style='margin-top: 7px;'
+          type="number"
+          [(ngModel)]="goal.targetAmount"
+        ></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button (click) = "update()" style="width: 100%; --background: #F2B354; --background-hover: #F4C276;">Update</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

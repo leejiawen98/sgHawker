@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button *ngIf="user" [routerLink]="['activity-history']">
+        <ion-icon
+          slot="icon-only"
+          name="document"
+          style="color: white"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="color: white"> My Activity </ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="segmentModel" (ngModelChange)="toggleOrders()">
+      <ion-segment-button value="ongoingOrders" class="segment-active-inactive">
+        Orders
+      </ion-segment-button>
+      <ion-segment-button
+        value="ongoingDeliveries"
+        class="segment-active-inactive"
+      >
+        Deliveries
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+  <ion-grid>
+    <div
+      *ngIf="segmentModel === 'ongoingDeliveries' && ongoingDeliveryRequests.length <= 0"
+    >
+      <ion-row class="ion-justify-content-center" style="margin-top: 50%">
+        <ion-text>
+          <ion-icon
+            name="bicycle-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text style="color: gray"> No delivery orders accepted </ion-text>
+      </ion-row>
+    </div>
+
+    <div *ngIf="segmentModel === 'ongoingOrders' && ongoingOrders.length <= 0">
+      <ion-row class="ion-justify-content-center" style="margin-top: 50%">
+        <ion-text>
+          <ion-icon
+            name="fast-food-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text style="color: gray"> No orders made </ion-text>
+      </ion-row>
+    </div>
+
+    <div *ngIf="segmentModel === 'ongoingOrders'">
+      <ion-row *ngFor="let order of ongoingOrders">
+        <app-order-summary
+          [order]="order"
+          [orderView]="'customer'"
+          (click)="showOrderDetails(order)"
+          style="width: 100%"
+        >
+        </app-order-summary>
+      </ion-row>
+    </div>
+
+    <div *ngIf="segmentModel === 'ongoingDeliveries'">
+      <ion-row *ngFor="let order of ongoingDeliveryRequests">
+        <app-order-summary
+          [order]="order"
+          [orderView]="'deliverer'"
+          (click)="showDeliveryOrderDetails(order)"
+          style="width: 100%"
+        >
+        </app-order-summary>
+      </ion-row>
+    </div>
+  </ion-grid>
+</ion-content>

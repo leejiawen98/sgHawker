@@ -1,0 +1,209 @@
+<ion-content>
+  <ion-grid width="100%">
+    <ion-row class="ion-align-items-center">
+      <ion-back-button defaultHref="/financeManagement/platformEarnings">
+      </ion-back-button>
+      <ion-text>
+        <h4 style="margin: 20px">Platform Earning Dashboard</h4>
+      </ion-text>
+      <!-- <ion-button class="button-outline" (click)="exportPDF()">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Export PDF
+      </ion-button> -->
+    </ion-row>
+    <ion-row class="ion-justify-content-center ion-align-items-center">
+      <ion-item style="width: 25%">
+        <ion-label style="font-weight: bold; color: gray">Start Date</ion-label>
+        <ion-datetime [(ngModel)]="startDate"></ion-datetime>
+      </ion-item>
+      &nbsp;&nbsp;
+      <ion-item style="width: 25%">
+        <ion-label style="font-weight: bold; color: gray">End Date</ion-label>
+        <ion-datetime [(ngModel)]="endDate"></ion-datetime>
+      </ion-item>
+      &nbsp;&nbsp;
+      <ion-button
+        color="info"
+        class="button-outline button-small"
+        (click)="filterByDuration()"
+        [disabled]="!(startDate && endDate)
+        "
+      >
+        <ion-icon slot="start" name="funnel"></ion-icon>
+        Filter
+      </ion-button>
+      &nbsp;&nbsp;
+      <ion-button
+        color="danger"
+        class="button-has-icon-only button-small"
+        (click)="resetDurationFilter()"
+      >
+        <ion-icon slot="start" name="reload"></ion-icon>
+        Reset
+      </ion-button>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <div style="display: flex; width: 100%">
+              <div style="width: 55%">
+                <!--Break down of percentage of subscription and delivery commission-->
+                <app-piechart
+                  id="earning-breakdown"
+                  [results]="earningPieChart"
+                  [chartTitle]="'Earning Proportion Breakdown'"
+                ></app-piechart>
+              </div>
+              <div style="width: 45%">
+                <ion-row>
+                  <app-number-card
+                    id="earning"
+                    [results]="earning"
+                    [cardColor]="'rgba(0, 166, 90, 0.6)'"
+                  ></app-number-card>
+                  <app-number-card
+                    id="delivery-comission"
+                    [results]="deliveryCommission"
+                    [cardColor]="'rgba(243, 156, 18, 0.6)'"
+                  ></app-number-card>
+                </ion-row>
+                <ion-row>
+                  <app-number-card
+                    id="subscription-fee"
+                    [results]="subscription"
+                    [cardColor]="'rgba(0, 192, 239, 0.6)'"
+                  ></app-number-card>
+                  <app-number-card
+                    id="refund"
+                    [results]="refund"
+                    [cardColor]="'rgba(245, 105, 84, 0.6)'"
+                  ></app-number-card>
+                </ion-row>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <!--line chart showing total earning by month, delivery commission by month, subscription fee, refund by platform by month-->
+            <app-multiline-chart
+              id="earning-summary"
+              [results]="earningByMonth"
+              [yAxisLabel]="'Total Earning'"
+              [xAxisLabel]="'Time'"
+              [chartTitle]="'Earning Breakdown By Month'"
+            ></app-multiline-chart>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row id="subscriber-summary">
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <!--line chart showing number of subscribers per month-->
+            <app-multiline-chart
+              [results]="subscriberByMonth"
+              [yAxisLabel]="'Number of Subscribers'"
+              [xAxisLabel]="'Time'"
+              [chartTitle]="'Subscriber By Month'"
+            ></app-multiline-chart>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <ion-row
+              class="ion-justify-content-center"
+              style="color: darkgray; font-weight: bold; font-size: medium"
+            >
+              Platform Transactions
+            </ion-row>
+            <table
+              datatable="ng"
+              *ngIf="transactions.length > 0"
+              [dtOptions]="dtOptions"
+              class="row-border hover"
+              width="100%"
+            >
+              <thead>
+                <tr>
+                  <th>Transaction Date</th>
+                  <th>Transaction Category</th>
+                  <th>Transaction Type</th>
+                  <th>Debited Refund Amount</th>
+                  <th>Delivery Fee Commission</th>
+                  <th>Subscription Fee Payment</th>
+                  <th>Associated Order Number</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody style="text-align: center">
+                <tr *ngFor="let transaction of transactions">
+                  <td>{{ transaction.transactionDate | date: "medium" }}</td>
+                  <td>
+                    <ion-badge
+                      color="success"
+                      *ngIf="transaction.transactionType === 'SUBSCRIPTION_PAYMENT' || transaction.transactionType === 'DELIVERY'"
+                    >
+                      CREDIT
+                    </ion-badge>
+                    <ion-badge
+                      color="danger"
+                      *ngIf="transaction.transactionType === 'REFUND'"
+                    >
+                      DEBIT
+                    </ion-badge>
+                  </td>
+                  <td>
+                    <ion-badge>
+                      {{transaction.transactionType.toString().replace("_", "
+                      ")}}
+                    </ion-badge>
+                  </td>
+                  <td>
+                    {{ transaction.refundedAmount ? (transaction.refundedAmount
+                    | currency: "USD") : "-" }}
+                  </td>
+                  <td>
+                    {{ transaction.deliveryFeeCommission ?
+                    (transaction.deliveryFeeCommission | currency: "USD") : "-"
+                    }}
+                  </td>
+                  <td>
+                    {{ transaction.paymentAmount ? (transaction.paymentAmount |
+                    currency: "USD") : "-" }}
+                  </td>
+                  <td>
+                    <ion-text>
+                      {{ transaction.order ? "#" +
+                      transaction.order._id.substring(
+                      transaction.order._id.length - 5 ): "-" }}
+                    </ion-text>
+                  </td>
+                  <td>
+                    <ion-button
+                      class="button-outline button-small"
+                      [disabled]="!transaction.order"
+                      (click)="viewOrderDetails(transaction.order)"
+                    >
+                      View Order Details
+                    </ion-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

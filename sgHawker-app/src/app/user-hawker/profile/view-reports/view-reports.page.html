@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-buttons slot="start" class="hawker-toolbar-button">
+      <ion-back-button defaultHref="/hawker/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="hawker-toolbar-title">Reports</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-grid>
+    <ion-row>
+      <app-report-card
+        (removeReportEvent)="updateReportList($event)"
+        style="width: 100%"
+        *ngFor="let report of allReports"
+        [report]="report"
+        [outlet]="outlet"
+      >
+      </app-report-card>
+    </ion-row>
+    <div *ngIf="!allReports || allReports.length === 0">
+      <ion-row class="ion-justify-content-center">
+        <ion-text>
+          <ion-icon
+            name="newspaper-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text style="color: gray"> You have not made any reports </ion-text>
+      </ion-row>
+    </div>
+  </ion-grid>
+</ion-content>

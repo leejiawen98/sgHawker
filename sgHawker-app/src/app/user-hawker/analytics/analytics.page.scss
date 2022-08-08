@@ -1,0 +1,25 @@
+.positionRelative{
+  position: relative;
+
+}
+.percentageValue {
+  left: 5px;
+  top: 37%;
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 23px;
+  font-weight: 600;
+}
+.demo-chart {
+  height: 400px;
+  width: 100%;
+}
+
+.img_conn{
+  height: 39vh;
+  width: 100%;
+  // display: block;
+  background-size: cover;
+  background-repeat: no-repeat;
+}

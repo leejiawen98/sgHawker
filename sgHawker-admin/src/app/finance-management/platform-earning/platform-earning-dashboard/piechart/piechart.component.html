@@ -1,0 +1,15 @@
+<br/>
+<ion-row class="ion-justify-content-center" style="color: darkgray; font-weight: bold; font-size: medium;">
+    {{ chartTitle }}
+</ion-row>
+<div style="display: flex;">
+    <ngx-charts-advanced-pie-chart
+    [results]="results"
+    [view]="view"
+    [scheme]="colorScheme"
+    [gradient]="gradient"
+    [valueFormatting]="valueFormat"
+    >
+    </ngx-charts-advanced-pie-chart>
+</div>
+

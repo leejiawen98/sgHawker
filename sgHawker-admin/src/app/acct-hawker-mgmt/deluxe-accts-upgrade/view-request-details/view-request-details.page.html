@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>View Upgrade Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="!masterOutlet" style="display: flex; justify-content: center">
+    <ion-spinner></ion-spinner>
+  </div>
+  <ion-grid *ngIf="masterOutlet">
+    <ion-row>
+      <ion-col>
+        <ion-list>
+          <ion-item>
+            <ion-label>Account Name</ion-label>
+            {{ hawker.name }}
+            <ion-icon name="chevron-down" (click)="viewContact()"></ion-icon>
+          </ion-item>
+          <ion-item *ngIf="!hidden" style="color: gray">
+            <ion-label>Phone Number</ion-label>
+            {{ hawker.phone }}
+          </ion-item>
+          <ion-item *ngIf="!hidden" style="color: gray">
+            <ion-label>Email</ion-label>
+            {{ hawker.email }}
+          </ion-item>
+          <ion-item>
+            <ion-label>Current Account Tier</ion-label>
+            <ion-badge color="primary"> {{ hawker.accountTier }} </ion-badge>
+          </ion-item>
+          <ion-item>
+            <ion-label>New Account Tier</ion-label>
+            <ion-badge color="tertiary"> DELUXE </ion-badge>
+          </ion-item>
+          <ion-item>
+            <ion-label>Master Outlet</ion-label>
+            <ion-text> {{masterOutlet.outletName}} </ion-text>
+          </ion-item>
+          <ion-item *ngIf="subscriptionFees">
+            <ion-label>Subscription Fee </ion-label>
+            <ion-text> S$100.00 /mth </ion-text>
+          </ion-item>
+          <ion-item *ngIf="subscriptionFees">
+            <ion-label>Pro-rated Payment Due By This Month</ion-label>
+            <ion-text>
+              S${{findProratedSubscriptionFee() | number : '1.2-2'}}
+            </ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-label>Verification Documents</ion-label>
+            <ion-button (click)="downloadDocuments()">
+              <ion-icon name="download" slot="start"> </ion-icon>
+              Download
+            </ion-button>
+          </ion-item>
+          <ion-row class="ion-justify-content-center">
+            <ion-button color="success" (click)="approveRequest()"
+              >Approve</ion-button
+            >
+            <ion-button color="danger" (click)="rejectRequest()"
+              >Reject</ion-button
+            >
+          </ion-row>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

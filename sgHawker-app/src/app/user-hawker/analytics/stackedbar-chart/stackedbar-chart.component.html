@@ -1,0 +1,21 @@
+<br/>
+<ion-row class="ion-justify-content-center" style="color: darkgray; font-weight: bold; font-size: medium;">
+    {{ chartTitle }}
+</ion-row>
+<div class="chart-wrapper">
+  <ngx-charts-bar-vertical-stacked
+      [view]="view"
+      [gradient]="gradient"
+      [results]="results"
+      [scheme]="colorScheme"
+      [legend]="showLegend"
+      [showXAxisLabel]="showXAxisLabel"
+      [showYAxisLabel]="showYAxisLabel"
+      [xAxis]="showXAxis"
+      [yAxis]="showYAxis"
+      [xAxisLabel]="xAxisLabel"
+      [yAxisLabel]="yAxisLabel"
+      >
+    </ngx-charts-bar-vertical-stacked>
+
+</div>

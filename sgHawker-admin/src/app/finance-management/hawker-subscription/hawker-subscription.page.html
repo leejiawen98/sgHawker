@@ -1,0 +1,190 @@
+<ion-content>
+  <ion-item class="ion-align-items-center">
+    <ion-text>
+      <h4 style="margin: 20px">Hawker Subscriptions</h4>
+    </ion-text>
+    <ion-button
+      color="warning"
+      style="margin-left: auto"
+      (click)="adjustSubscriptionFees()"
+    >
+      <ion-icon name="options-outline"></ion-icon>
+      Adjust Subscription Fees
+    </ion-button>
+  </ion-item>
+
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
+        <!-- Filter -->
+        <ion-row *ngIf="showFilter" class="ion-align-items-center">
+          <ion-col size="2" style="margin-left: 20px; font-weight: bold"
+            >Account Tier</ion-col
+          >
+          <ion-col size="3">
+            <ion-segment
+              [value]="accountTierType"
+              (ionChange)="accountTierChanged($event)"
+            >
+              <ion-segment-button value="ALL">
+                <ion-label>All</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="PREMIUM">
+                <ion-label>Premium</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="DELUXE">
+                <ion-label>Deluxe</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </ion-col>
+        </ion-row>
+
+        <ion-row *ngIf="showFilter" class="ion-align-items-center">
+          <ion-col size="2" style="margin-left: 20px; font-weight: bold"
+            >Payment Status</ion-col
+          >
+          <ion-col size="4">
+            <ion-segment
+              [value]="paymentStatus"
+              (ionChange)="paymentStatusChanged($event)"
+            >
+              <ion-segment-button value="ALL">
+                <ion-label>All</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="PAID">
+                <ion-label>Paid</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="PENDING">
+                <ion-label>PENDING</ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="OVERDUE">
+                <ion-label>Overdue</ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </ion-col>
+        </ion-row>
+
+        <ion-row *ngIf="showFilter">
+          <ion-col>
+            <ion-button
+              color="primary"
+              class="button-outline button-small"
+              style="margin-left: 20px"
+              (click)="filterSubscriptions()"
+            >
+              <ion-icon slot="start" name="funnel"></ion-icon>
+              Apply Filter
+            </ion-button>
+            <ion-button
+              color="danger"
+              class="button-has-icon-only button-small"
+              (click)="resetAllFilters()"
+            >
+              <ion-icon slot="start" name="reload"></ion-icon>
+              Reset All Filters
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+        <!-- Subscription Table -->
+        <ion-row>
+          <ion-col>
+            <table
+              *ngIf="outlets.length > 0"
+              datatable="ng"
+              [dtOptions]="dtOptions"
+              class="row-border hover"
+            >
+              <thead>
+                <tr>
+                  <th>Hawker Account</th>
+                  <th>Account Tier</th>
+                  <th>Master Outlet</th>
+                  <th>Subscription Payment Due</th>
+                  <th>Subscription Payment Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody style="text-align: center">
+                <tr *ngFor="let outlet of outlets">
+                  <td>{{ outlet.hawkerAccount.name }}</td>
+                  <td>
+                    <ion-badge
+                      color="primary"
+                      *ngIf="outlet.hawkerAccount.accountTier === 'PREMIUM'"
+                      >PREMIUM</ion-badge
+                    >
+                    <ion-badge
+                      color="tertiary"
+                      *ngIf="outlet.hawkerAccount.accountTier === 'DELUXE'"
+                      >DELUXE</ion-badge
+                    >
+                    <ion-badge
+                      color="medium"
+                      *ngIf="outlet.hawkerAccount.accountTier === 'FREE'"
+                    >
+                      FREE</ion-badge
+                    >
+                  </td>
+                  <td>
+                    <ion-text
+                      *ngIf="outlet.hawkerAccount.accountTier !== 'FREE'"
+                    >
+                      {{ outlet.outletName }}
+                    </ion-text>
+                    <ion-text
+                      *ngIf="outlet.hawkerAccount.accountTier === 'FREE'"
+                    >
+                      -
+                    </ion-text>
+                  </td>
+                  <td>
+                    <ion-text *ngIf="outlet.wallet">
+                      $ {{ outlet.wallet.subscriptionPaymentDue }}
+                    </ion-text>
+                  </td>
+                  <td>
+                    <ion-badge
+                      color="danger"
+                      *ngIf="checkSubscriptionFeeStatus(outlet) === 'OVERDUE'"
+                    >
+                      OVERDUE
+                    </ion-badge>
+                    <ion-badge
+                      color="warning"
+                      *ngIf="checkSubscriptionFeeStatus(outlet) === 'PENDING'"
+                    >
+                      PENDING
+                    </ion-badge>
+                    <ion-badge
+                      color="success"
+                      *ngIf="checkSubscriptionFeeStatus(outlet) === 'PAID'"
+                    >
+                      PAID
+                    </ion-badge>
+                  </td>
+                  <td>
+                    <ion-button
+                      class="button-outline"
+                      style="float: left"
+                      (click)="showTransactionHistoryModal(outlet)"
+                    >
+                      View Details
+                    </ion-button>
+                    <ion-button
+                      color="primary"
+                      (click)="downgradeAccountTier(outlet)"
+                      [class.button-disabled]="outlet.hawkerAccount.accountTier === 'FREE' || checkSubscriptionFeeStatus(outlet) !== 'OVERDUE'"
+                    >
+                      Downgrade
+                    </ion-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

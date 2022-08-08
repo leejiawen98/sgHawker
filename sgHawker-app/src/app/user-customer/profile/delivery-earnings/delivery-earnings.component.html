@@ -1,0 +1,222 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close" style="color: white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="color: white;">
+        Delivery Earnings
+      </ion-title> 
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <br>
+  <ion-row>
+    <ion-card style = "width: 100%;">
+      <ion-grid>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+          <ion-card-title>
+            Top Deliverers (Month)
+          </ion-card-title>
+          <ion-card-content>
+            <!-- <div *ngIf = "this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >0">
+              1st: {{this.sortedDeliverersName[0]}} with ${{this.sortedDeliverersEarnings[0]}}
+            </div>
+            <div *ngIf = "this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >1">
+              2nd: {{this.sortedDeliverersName[1]}} with ${{this.sortedDeliverersEarnings[1]}}
+            </div>
+            <div *ngIf = "this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >2">
+              3rd: {{this.sortedDeliverersName[2]}} with ${{this.sortedDeliverersEarnings[2]}}
+            </div> -->
+            <ion-row>
+              <!-- 2nd place -->
+              <ion-col size="3.5">
+                <div
+                  class="ribbon-container"
+                  *ngIf="this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >1"
+                >
+                  <ion-avatar class="silver">
+                    <img
+                      
+                      src="https://avatars.dicebear.com/api/initials/{{this.sortedDeliverersName[1]}}.svg"
+                      onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                    />
+                  </ion-avatar>
+                  <img class="img-button" src="../../../assets/medal2.png" />
+                </div>
+                <div *ngIf="this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >1">
+                  <p
+                    style="font-weight: bolder; margin-top: 20px"
+                    class="ion-text-center"
+                  >
+                  {{this.sortedDeliverersName[1]}}
+                  </p>
+                  <p style="margin-top: 20px; font-size: x-large;"
+                  class="ion-text-center">${{this.sortedDeliverersEarnings[1].toFixed(2)}}</p>
+                </div>
+              </ion-col>
+      
+              <!-- 1st place -->
+              <ion-col size="5">
+                <div
+                  class="ribbon-container"
+                  *ngIf="this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >0"
+                >
+                  <ion-avatar class="gold">
+                    <img
+                      
+                      src="https://avatars.dicebear.com/api/initials/{{this.sortedDeliverersName[0]}}.svg"
+                      onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                    />
+                  </ion-avatar>
+                  <img class="img-button" src="../../../assets/medal1.png" />
+                </div>
+                <div *ngIf="this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >0">
+                  <p
+                    style="font-weight: bolder; margin-top: 20px"
+                    class="ion-text-center"
+                  >
+                  {{this.sortedDeliverersName[0]}}
+                  </p>
+                  <p style="margin-top: 20px; font-size: x-large;"
+                  class="ion-text-center">${{this.sortedDeliverersEarnings[0].toFixed(2)}}</p>
+                </div>
+              </ion-col>
+      
+              <!-- 3rd place -->
+              <ion-col size="3.5">
+                <div  
+                  class="ribbon-container"
+                  *ngIf="this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >2"
+                >
+                  <ion-avatar class="bronze">
+                    <img
+                      
+                      src="https://avatars.dicebear.com/api/initials/{{this.sortedDeliverersName[2]}}.svg"
+                      onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                    />
+                  </ion-avatar>
+                  <img class="img-button" src="../../../assets/medal3.png" />
+                </div>
+                <div *ngIf="this.sortedDeliverersName !== undefined && this.sortedDeliverersName.length >2">
+                  <p
+                    style="font-weight: bolder; margin-top: 20px"
+                    class="ion-text-center"
+                  >
+                  {{this.sortedDeliverersName[2]}}
+                  </p>
+                  <p style="margin-top: 20px; font-size: x-large;"
+                  class="ion-text-center">${{this.sortedDeliverersEarnings[2].toFixed(2)}}</p>
+                </div>
+              </ion-col>
+            </ion-row>
+        </ion-card-content>
+      </ion-col>
+        </ion-row>
+      </ion-grid> 
+    </ion-card>
+  
+    <ion-card style="width: 100%;">
+      <ion-grid>
+        <ion-row class="ion-align-items-center">
+          <ion-col size = "9">
+          <ion-card-title *ngIf ="deliveryEarningsFilter === 'week' || deliveryEarningsFilter === undefined">
+            Your Earnings This Week 
+          </ion-card-title>
+          <ion-card-title *ngIf ="deliveryEarningsFilter === 'month' ">
+            Your Earnings This Month
+          </ion-card-title>
+          <ion-card-title *ngIf ="deliveryEarningsFilter === 'day'">
+            Your Earnings Today 
+          </ion-card-title>
+        </ion-col>
+        <ion-col size = "1" style="margin-left: 10%;">
+          <ion-button class="button-has-icon-only" fill="clear" (click)="dateSelect.open()">
+            <ion-icon name="filter"> </ion-icon>
+          </ion-button>
+          <ion-select [(ngModel)]="deliveryEarningsFilter" #dateSelect class="ion-hide" (ionChange)="filterDeliveryEarning();"
+            >
+            <ion-select-option value="day">Today</ion-select-option>
+          <ion-select-option value="week">This Week</ion-select-option>
+          <ion-select-option value="month">This Month</ion-select-option>
+          </ion-select>
+        </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-badge style ="font-size: xx-large;" color="secondary">${{this.tempDeliveryEarnings.toFixed(2)}}</ion-badge>
+          </ion-col>
+        </ion-row>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+        <ion-card-content>
+          <br>
+            <div echarts [options]="earningsCentresChartOption"></div>
+        </ion-card-content>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+        <ion-card-content>
+          <br>
+            <div echarts [options]="earningsOutletChartOption"></div>
+        </ion-card-content>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card>
+  <ion-card style = "width: 100%;">
+    <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        <ion-card-content>
+        <ion-row class="ion-align-items-center">
+          <ion-card-title>
+            Your Earnings vs Last Month
+          </ion-card-title>
+        </ion-row>
+        <br>
+        <ion-row>
+          <ion-col>
+            <ion-row *ngIf = "checkMonthlyPercentage()">
+              <ion-badge style ="font-size: xx-large;" color="danger">{{this.monthlyComparisonPercentage}}</ion-badge>
+              </ion-row>
+              <ion-row *ngIf = "!checkMonthlyPercentage()">
+                <ion-badge style ="font-size: xx-large;" color="success">{{this.monthlyComparisonPercentage}}</ion-badge>
+                </ion-row>
+            <br>
+            <p>
+              <b>This Month's Earning: ${{this.thisMonthDeliveryEarnings.toFixed(2)}}</b>
+            </p>
+            <br>
+            <p><b>
+              Last Month's Earning: ${{this.lastMonthDeliveryEarnings.toFixed(2)}}</b>
+            </p>
+
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-col>
+      </ion-row>
+    </ion-grid>
+    </ion-card>
+  <!-- <ion-card style = "width: 100%;">
+    <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        <ion-card-content>
+          <div></div>
+      </ion-card-content>
+    </ion-col>
+      </ion-row>
+    </ion-grid> 
+  </ion-card> -->
+  
+  </ion-row>
+
+</ion-content>

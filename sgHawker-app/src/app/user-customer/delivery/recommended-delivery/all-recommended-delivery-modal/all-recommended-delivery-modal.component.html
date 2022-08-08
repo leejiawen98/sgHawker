@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="dismissModal()">
+        <ion-icon
+          slot="icon-only"
+          ios="close"
+          md="close"
+          style="color: white"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <ion-row class="ion-align-items-end ion-justify-content-center">
+        <img src="../../assets/Logo - White.svg" width="40%" height="30%" />
+      </ion-row>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="borderless-ion-card">
+          <ion-card-title> Recommended Deliveries </ion-card-title>
+        </ion-card>
+        <ion-list>
+          <ion-item-group *ngFor="let entry of outletMap | keyvalue">
+            <ion-item-divider>
+              <ion-label style="color: black; font-weight: bold;">{{ entry.key }}</ion-label>
+            </ion-item-divider>
+            <ion-item *ngFor="let order of entry.value" (click)="openDeliveryOrderDetails(order)">
+              <div style="display: flex; flex-direction: column">
+                <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+                  {{ order.individualOrderItems?.length + order.foodBundleOrderItems?.length }} items
+                </ion-label>
+                <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+                  Deliver to {{ order.deliveryAddress.addressDetails + ' ' + order.deliveryAddress.postalCode}}
+                </ion-label>
+                <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+                  Pickup time: {{ order.orderPickUpTime | date: 'dd/MM/yy HH:mm' }}
+                </ion-label>
+                <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+                  Delivery Fee: ${{ order.deliveryFee | currency: "USD" }}
+                </ion-label>
+                <ion-row class="ion-align-items-center">
+                  <ion-badge color="warning" *ngFor="let type of order.outlet.cuisineType"
+                    style="font-size: x-small; margin: 3px">
+                    {{type}}
+                  </ion-badge>
+                </ion-row>
+              </div>
+              <ion-thumbnail slot="end">
+                <img src="../../../assets/sgHawkerAppIcon.svg" />
+              </ion-thumbnail>
+            </ion-item>
+          </ion-item-group>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

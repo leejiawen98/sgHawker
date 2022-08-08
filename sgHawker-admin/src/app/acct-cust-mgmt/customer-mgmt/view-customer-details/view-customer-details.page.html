@@ -1,0 +1,166 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Customer Accounts</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="2"></ion-col>
+      <ion-col size="8">
+        <ion-card>
+          <ion-row>
+            <ion-col *ngIf="readOnly">
+              <ion-button (click)="edit()" size="small" class="ion-float-right">
+                <ion-icon name="pencil" slot="end"> </ion-icon>
+                Edit
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-thumbnail
+                style="--size: 130px; display: block; margin: 0 auto"
+              >
+                <img
+                  src="{{baseUrl}}{{customer.profileImgSrc}}"
+                  onerror="this.src='/assets/Profile Picture.svg';"
+                />
+              </ion-thumbnail>
+            </ion-col>
+          </ion-row>
+          <form [formGroup]="customerAccountForm">
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label>Name:</ion-label>
+                  <ion-input
+                    class="ion-text-right"
+                    type="text"
+                    formControlName="name"
+                    [readonly]="readOnly"
+                  ></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label>Email:</ion-label>
+                  <ion-input
+                    class="ion-text-right"
+                    [readonly]="readOnly"
+                    type="text"
+                    formControlName="email"
+                  ></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label>Phone Number:</ion-label>
+                  <ion-input
+                    class="ion-text-right"
+                    [readonly]="readOnly"
+                    type="text"
+                    formControlName="phone"
+                  ></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label>Address:</ion-label>
+                  <ion-button
+                    (click)="viewAddresses()"
+                    *ngIf="customer.addresses?.length > 0 && readOnly"
+                    size="small"
+                    class="ion-float-right"
+                  >
+                    View Address
+                  </ion-button>
+                  <ion-button
+                    color="primary"
+                    (click)="viewAddresses()"
+                    *ngIf="customer.addresses?.length > 0 && !readOnly"
+                    size="small"
+                    class="ion-float-right"
+                  >
+                    Edit Address
+                  </ion-button>
+                  <ion-text
+                    *ngIf="customer.addresses?.length === 0"
+                    class="ion-float-right"
+                  >
+                    No address available
+                  </ion-text>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label>Account Status: </ion-label>
+                  <ion-select
+                    class="ion-text-right"
+                    formControlName="accountStatus"
+                    name="accountStatus"
+                    [disabled]="readOnly"
+                  >
+                    <ion-select-option value="ACTIVE">Active</ion-select-option>
+                    <ion-select-option value="SUSPENDED"
+                      >Suspended</ion-select-option
+                    >
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label>Vaccination Status: </ion-label>
+                  <ion-select
+                    class="ion-text-right"
+                    formControlName="isVaccinated"
+                    name="isVaccinated"
+                    [disabled]="readOnly"
+                  >
+                    <ion-select-option [value]="true"
+                      >Vaccinated</ion-select-option
+                    >
+                    <ion-select-option [value]="false"
+                      >Not Vaccinated</ion-select-option
+                    >
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col *ngIf="!readOnly" class="ion-text-right">
+                <ion-button
+                  color="success"
+                  (click)="updateAccountStatus()"
+                  size="small"
+                >
+                  UPDATE
+                </ion-button>
+              </ion-col>
+              <ion-col *ngIf="!readOnly" class="ion-text-left">
+                <ion-button color="danger" (click)="cancel()" size="small">
+                  CANCEL
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </form>
+        </ion-card>
+      </ion-col>
+      <ion-col size="2"></ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

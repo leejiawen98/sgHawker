@@ -1,0 +1,147 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center">
+      <ion-buttons style="margin-left: 10px;" (click)="showSynchroniseInformation()">
+        <ion-button>
+          <ion-icon name="information-circle-outline" style="font-size: 25px; color: white;"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title style="color: white">Synchronise {{modalTitle}}</ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label>Select outlet(s)</ion-label>
+          <ion-select placeholder="Select outlets" [(ngModel)]="selectedOutlets" multiple
+            (ionChange)="setSelectedOutlets($event)">
+            <ion-select-option value="all">All Outlets</ion-select-option>
+            <ion-select-option *ngFor="let o of hawker.outlets" [value]="o">{{o.outletName}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <!-- USER WANTS A DIFF MENU NAME -->
+    <ion-row *ngIf="type === 'Menu'">
+      <ion-col>
+        <ion-item>
+          <ion-label>Sync Type:</ion-label>
+          <ion-radio-group value="{{menuSyncType}}" style="display:flex; text-align: end;">
+            <ion-item>
+              <ion-radio style="margin-left:10px;" value="existing" (ionFocus)="changeMenuSyncType('existing')"></ion-radio>
+              <ion-label style="margin-left:7px; width:50%;">Use Existing</ion-label>
+    
+              <ion-radio style="margin-left:10px" value="new" (ionFocus)="changeMenuSyncType('new')"></ion-radio>
+              <ion-label style="margin-left:7px; width:50%;">Create New</ion-label>
+            </ion-item>
+          </ion-radio-group>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row *ngIf="menuSyncType === 'new'">
+      <ion-col>
+        <ion-item>
+          <ion-label>Menu Name</ion-label>
+          <ion-input [(ngModel)]="newMenuName" placeholder="Enter new menu name" style="text-align: end;"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+
+    <!-- MENUS -->
+    <ion-row
+    *ngIf="selectedOutlets && 
+    (type === 'FoodBundle' || type === 'FoodBundle-delete' || type === 'FoodBundles' 
+    || type === 'MenuCategories' || type === 'MenuCategory' || type === 'MenuCategory-delete'
+    || type === 'FoodItemsInMenu' || type === 'FoodItemsInMenu-delete')">
+      <ion-col>
+        <ion-item>
+          <ion-label>Select menu(s)</ion-label>
+          <ion-select placeholder="Select menus" [(ngModel)]="selectedMenus" multiple>
+            <ion-select-option value="all">All Menus</ion-select-option>
+            <ion-select-option *ngFor="let m of menusOfSelectedOutlets" [value]="m">{{m.menuName}} {{'\n'}}  - {{m.outlet.outletName}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <!-- FOOD ITEMS -->
+    <div *ngIf="selectedOutlets && (type === 'FoodItems' || type === 'FoodItemsInMenu')">
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label>Select food item(s)</ion-label>
+            <ion-select placeholder="Select food items" [(ngModel)]="selectedFoodItems" multiple>
+              <ion-select-option value="all">All</ion-select-option>
+              <ion-select-option *ngFor="let f of foodItems" [value]="f">{{f.itemName}}</ion-select-option>
+            </ion-select>
+          </ion-item> 
+        </ion-col>
+      </ion-row>
+      <ion-row *ngIf="type !== 'FoodItemsInMenu'">
+        <ion-col>
+            <ion-radio-group value="{{foodItemSyncType}}" style="display:flex;">
+              <ion-item style="width:100%">
+                <ion-label>Sync Type:</ion-label>
+                
+                <ion-radio style="margin-left:10px;" value="replace" (ionFocus)="changeRadio('replace')"></ion-radio>
+                <ion-label style="margin-left:7px">Replace All</ion-label>
+      
+                <ion-radio style="margin-left:10px" value="addon" (ionFocus)="changeRadio('addon')"></ion-radio>
+                <ion-label style="margin-left:7px">Add on to existing</ion-label>
+              </ion-item>
+            </ion-radio-group>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <!-- MENU CATEGORIES -->
+    <ion-row *ngIf="selectedOutlets && type === 'MenuCategories'">
+      <ion-col>
+        <ion-item>
+          <ion-label>Select menu categories</ion-label>
+          <ion-select placeholder="Select menu categories" [(ngModel)]="selectMenuCategories" multiple>
+            <ion-select-option value="all">All Menu Categories</ion-select-option>
+            <ion-select-option *ngFor="let mc of menuCategoriesOfMenuToSync" [value]="mc">{{mc.categoryName}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <!-- Food Bundles -->
+    <div *ngIf="selectedOutlets && (type === 'FoodBundles')">
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label>Select food bundle(s)</ion-label>
+            <ion-select placeholder="Select food bundles" [(ngModel)]="selectedFoodItems" multiple>
+              <ion-select-option value="all">All</ion-select-option>
+              <ion-select-option *ngFor="let fb of foodBundles" [value]="fb">{{fb.bundleName}}</ion-select-option>
+            </ion-select>
+          </ion-item> 
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <br />
+    <br />
+    <ion-row>
+      <ion-col>
+        <ion-button expand="full" (click)="sync()">
+          <ion-icon name="sync-outline"></ion-icon> &nbsp; Synchronise
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

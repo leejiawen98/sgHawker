@@ -1,0 +1,148 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()" style="font-size: 15px;" fill="clear">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Comparison</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <h1 class="ion-text-center">
+          {{ currentFoodItem.itemName }}
+        </h1>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <div echarts [options]="updateOptions" class="demo-chart"></div>
+      </ion-col>
+    </ion-row>
+    <ion-row style="margin-top: -5px;">
+      <ion-col *ngIf="currentFoodItem.numOfSales > foodItem.numOfSales" class="ion-text-center">
+        <ion-chip color="success">
+          <ion-icon name="pin" color="primary"></ion-icon>
+          <ion-label>Difference in {{currentFoodItem.itemName }} Sales: <span *ngIf="currentFoodItem.numOfSales > foodItem.numOfSales">+</span> {{currentFoodItem.numOfSales - foodItem.numOfSales}}</ion-label>
+        </ion-chip>
+      </ion-col>
+      <ion-col *ngIf="currentFoodItem.numOfSales < foodItem.numOfSales" class="ion-text-center">
+        <ion-chip color="danger" style="height: 50px;">
+          <ion-icon name="pin" color="primary"></ion-icon>
+          <ion-label>Difference in {{currentFoodItem.itemName }} Sales: {{currentFoodItem.numOfSales - foodItem.numOfSales}}</ion-label>
+        </ion-chip>
+      </ion-col>
+      <!-- <ion-col *ngIf="currentFoodItem.numOfSales === foodItem.numOfSales" class="ion-text-center">
+        <ion-chip color="success">
+          <ion-icon name="pin" color="primary"></ion-icon>
+          <ion-label>Sales for {{ currentFoodItem.itemName }} is equivalent to {{ foodItem.outletName }}</ion-label>
+        </ion-chip>
+      </ion-col> -->
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-grid>
+          <ion-row class="withBorder">
+            <ion-col size="2" style="background-color: #E8E8E8">
+
+            </ion-col>
+            <ion-col size="5" class="header" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-center">
+                <ion-label>{{currentFoodItem.outletName}}</ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="5" class="header" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-center">
+                <ion-label>{{foodItem.outletName}}</ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row class="withBorder">
+            <ion-col size="2" class="ion-align-self-center">
+              <ion-item lines="none">
+                <ion-label style="font-weight: bold;">
+                  Price:
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="5" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-center">
+                <ion-label>
+                  ${{currentFoodItem.itemPrice}}
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="5" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-center">
+                <ion-label>
+                  ${{foodItem.itemPrice}}
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row class="withBorder">
+            <ion-col size="2" class="ion-align-self-center">
+              <ion-item lines="none">
+                <ion-label style="font-weight: bold;">
+                  Description:
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="5" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-center ion-text-wrap">
+                <ion-label>
+                  {{currentFoodItem.itemDescription}}
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="5" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-center item-text-wrap">
+                <ion-label>
+                  {{foodItem.itemDescription}}
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row class="withBorder">
+            <ion-col size="2" class="ion-align-self-center">
+              <ion-item lines="none">
+                <ion-label style="font-weight: bold; font-size: 15px">
+                  Customization:
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="5" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-wrap"
+                *ngFor="let customization of currentFoodItem.itemCustomizations">
+                <ion-label>
+                  {{customization.customizationName}}
+                  <ul>
+                    <li *ngFor="let options of customization.customizationOptions">
+                      {{options.optionName}}
+                    </li>
+                  </ul>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="5" style="border-left: 1px solid black">
+              <ion-item lines="none" class="ion-text-wrap"
+                *ngFor="let customization of foodItem.itemCustomizations">
+                <ion-label>
+                  {{customization.customizationName}}
+                  <ul>
+                    <li *ngFor="let options of customization.customizationOptions">
+                      {{options.optionName}}
+                    </li>
+                  </ul>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

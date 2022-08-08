@@ -1,0 +1,19 @@
+<ion-list>
+  <div *ngFor="let item of items; let i = index" (click)="navigateToAddMenuPage(i)">
+    <ion-item *ngIf="(item.type === 'SYNC-MENU' && hawker.accountTier === 'DELUXE' && outlet.isMaster === true) || (item.type !== 'SYNC-MENU') || (item.type !== 'SYNC-MENU' && hawker.accountTier !== 'DELUXE' && outlet.isMaster !== true)">
+      <ion-icon style="padding-right: 8px;"  *ngIf="item.type === 'MANAGE'" name="pencil"></ion-icon>
+      <ion-icon style="padding-right: 8px;"  *ngIf="!item.type || item.type === 'ADD'" name="add-circle-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'FOOD'" name="fast-food-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'SET'" name="settings-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'STOP'" name="stop-circle-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'CARD'" name="card-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'BANK'" name="cash-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'FAVOURITE'" name="heart-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'SYNC-MENU'" name="sync-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'SYNC'" name="sync-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'QRCODE'" name="qr-code-outline"></ion-icon>
+      <ion-icon style="padding-right: 8px;" *ngIf="item.type === 'BASKET'" name="basket-outline"></ion-icon>
+      &nbsp;<ion-text style="white-space: nowrap;">{{item.label}}</ion-text>
+    </ion-item>
+  </div>
+</ion-list>

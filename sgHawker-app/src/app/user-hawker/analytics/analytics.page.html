@@ -1,0 +1,1157 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-title class="hawker-toolbar-title">Analytics</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-segment [(ngModel)]="segmentModel" mode="md">
+          <ion-segment-button value="overview" (click)="resetView()">
+            <ion-label>Overview</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="goals">
+            <ion-label>Goals</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="compare">
+            <ion-label>Comparative</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid *ngIf="segmentModel === 'overview'">
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <ion-grid>
+              <ion-row class="ion-align-items-center">
+                <ion-col *ngIf="masterOutlet" size="5" class="ion-no-padding">
+                  <ion-card class="ion-no-padding">
+                    <ion-item lines="none">
+                      <ion-label>Outlets To Display</ion-label>
+                      <ion-select placeholder="All Outlets" multiple="true" [(ngModel)]="selectedOutlets"
+                        (ionChange)="onSelectedOutlets()" okText="DISPLAY">
+                        <ion-select-option *ngFor="let outlet of hawkerOutlets" [value]="outlet">{{outlet.outletName}}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-card>
+                </ion-col>
+                <ion-col class="ion-text-end">
+                  <ion-button fill="outline" color="danger" (click)="resetView()">
+                    <ion-icon slot="start" name="refresh"></ion-icon>
+                    Reset View
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-row>
+                    <ion-col *ngIf="activate !== ActivateType.WEEK">
+                      <ion-button shape="round" fill="outline" (click)="quickAccessFilter(ActivateType.WEEK)">
+                        Last Week
+                      </ion-button>
+                    </ion-col>
+                    <ion-col *ngIf="activate === ActivateType.WEEK">
+                      <ion-button shape="round" fill="solid" (click)="resetView()">
+                        Last Week
+                      </ion-button>
+                    </ion-col>
+                    <ion-col *ngIf="activate !== ActivateType.MONTH">
+                      <ion-button shape="round" fill="outline" (click)="quickAccessFilter(ActivateType.MONTH)">
+                        Last Month
+                      </ion-button>
+                    </ion-col>
+                    <ion-col *ngIf="activate === ActivateType.MONTH">
+                      <ion-button shape="round" fill="solid" (click)="resetView()">
+                        Last Month
+                      </ion-button>
+                    </ion-col>
+                    <ion-col *ngIf="activate !== ActivateType.SIX_MONTHS">
+                      <ion-button shape="round" fill="outline" (click)="quickAccessFilter(ActivateType.SIX_MONTHS)">
+                        Last 6 Month
+                      </ion-button>
+                    </ion-col>
+                    <ion-col *ngIf="activate === ActivateType.SIX_MONTHS">
+                      <ion-button shape="round" fill="solid" (click)="resetView()">
+                        Last 6 Month
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-col>
+                <ion-col class="ion-text-end ion-no-padding">
+                  <ion-row class="ion-align-items-center">
+                    <ion-col>
+                      <ion-item>
+                        <ion-label style="font-weight: bold; color: gray">Start Date</ion-label>
+                        <ion-datetime [(ngModel)]="startDate"></ion-datetime>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col class="ion-text-center" size="1"> to </ion-col>
+                    <ion-col>
+                      <ion-item>
+                        <ion-label style="font-weight: bold; color: gray">End Date</ion-label>
+                        <ion-datetime [(ngModel)]="endDate"></ion-datetime>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col>
+                      <ion-button fill="outline" (click)="filterDate()">
+                        <ion-icon slot="start" name="options"></ion-icon>
+                        Apply Filter
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <!-- <app-multiline-chart
+                  id="earning-summary"
+                  [results]="earningsChart"
+                  [yAxisLabel]="'Total Earning ($)'"
+                  [xAxisLabel]="'In ' + chartDateType"
+                  [chartTitle]="'Earnings Breakdown ' + title"
+                ></app-multiline-chart> -->
+                <app-echarts-graph
+                  [results]="earningsChart"
+                  [yAxisLabel]="'Total Earnings (S$)'"
+                  [xAxisLabel]="'In Days'"
+                  [chartTitle]="'Earnings Breakdown ' + title"
+                  [chartType]="'LINE'"
+                  [thresholdSliderTitle]="'Minimum earnings threshold (S$ _)'"
+                  [thresholdTitle]=" masterOutlet ? 'Outlet(s) below threshold: ' : null"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="salesChart"
+                  [yAxisLabel]="'Total No. of Sales'"
+                  [xAxisLabel]="'In Days'"
+                  [chartTitle]="'No. of Sales Breakdown ' + title"
+                  [chartType]="'LINE'"
+                  [thresholdSliderTitle]="'Minimum orders threshold (_ qty)'"
+                  [thresholdTitle]=" masterOutlet ? 'Outlet(s) below threshold: ' : null"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="orderPerformanceChart"
+                  [yAxisLabel]="'Time Taken (mins)'"
+                  [xAxisLabel]="'In Days'"
+                  [chartTitle]="'Average Time taken Per Order ' + title"
+                  [chartType]="'LINE'"
+                  [thresholdSliderTitle]="'Minimum time taken threshold (_ mins)'"
+                  [thresholdTitle]=" masterOutlet ? 'Outlet(s) below threshold: ' : null"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="4">
+        <ion-card [ngStyle] = "{'height': (masterOutlet) ? '97%' : 'auto'}">
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="foodItemChart"
+                  [chartTitle]="'Overall Food Items Sold ' + title"
+                  [chartType]="'PIE'"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="8" *ngIf="masterOutlet">
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="foodItemChart"
+                  [yAxisLabel]="'Quantity Sold'"
+                  [xAxisLabel]="'Food Items'"
+                  [chartTitle]="'Types of Food Items sold ' + title"
+                  [chartType]="'BAR'"
+                  [thresholdSliderTitle]="'Minimum orders threshold (_ qty)'"
+                  [thresholdTitle]=" 'Food Item(s) below threshold:'"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="4">
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="dinerTypeChart"
+                  [chartTitle]="'Overall Diner Type ' + title"
+                  [chartType]="'PIE'"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="8" *ngIf="masterOutlet">
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="dinerTypeChart"
+                  [yAxisLabel]="'No. of Orders'"
+                  [xAxisLabel]="'Diner Types'"
+                  [chartTitle]="'Types of Diners ' + title"
+                  [chartType]="'BAR'"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="4">
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="paymentTypeChart"
+                  [chartTitle]="'Overall Payment Type ' + title"
+                  [chartType]="'PIE'"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="8" *ngIf="masterOutlet">
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="paymentTypeChart"
+                  [yAxisLabel]="'No. of Orders'"
+                  [xAxisLabel]="'Payment Types'"
+                  [chartTitle]="'Types of Payment Modes ' + title"
+                  [chartType]="'BAR'"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-content>
+            <ion-row>
+              <ion-col>
+                <app-echarts-graph
+                  [results]="cashbackChart"
+                  [yAxisLabel]="'No. of Orders'"
+                  [xAxisLabel]="'Cashback Rates'"
+                  [chartTitle]="'Types of Cashback Rates ' + title"
+                  [chartType]="'BAR'"
+                  [thresholdSliderTitle]="'Minimum orders threshold (_ qty)'"
+                  [thresholdTitle]="'Cashback type(s) below threshold: '"
+                ></app-echarts-graph>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div *ngIf="segmentModel === 'goals'">
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-grid>
+            <ion-row>
+              <ion-col size="4">
+
+              </ion-col>
+              <ion-col size="4" *ngIf="outlet.isMaster" class="ion-text-center">
+                <h1 *ngIf="!masterView">{{outlet.outletName}}</h1>
+                <h1 *ngIf="masterView">Master View</h1>
+              </ion-col>
+              <ion-col *ngIf="!outlet.isMaster" class="ion-text-center">
+                <h1>{{outlet.outletName}}</h1>
+              </ion-col>
+              <ion-col
+                size="4"
+                *ngIf="outlet.isMaster"
+                class="ion-text-right"
+              >
+                <ion-button
+                  *ngIf="outlet.isMaster && !masterView"
+                  (click)="changeView()"
+                  size="small"
+                  >Master View
+                </ion-button>
+                <ion-button
+                  *ngIf="outlet.isMaster && masterView"
+                  (click)="changeView()"
+                  size="small"
+                  >Outlet View
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <!-- NON-MASTER VIEW -->
+    <div *ngIf="!masterView">
+      <ion-grid>
+        <!-- NO TARGETED SALES -->
+        <ion-row>
+          <ion-col size="6">
+            <ion-card style="height: 310px" *ngIf="outlet.goals.length === 0 || salesTarget === undefined">
+              <ion-card-header>
+                <ion-item lines="none" style="margin-top: -10px">
+                  <ion-card-subtitle>SALES</ion-card-subtitle>
+                  <ion-button
+                    (click)="openAddGoalModal('SALES')"
+                    fill="clear"
+                    slot="end"
+                    >Set now</ion-button
+                  >
+                </ion-item>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-grid style="margin-top: -25px">
+                  <ion-row>
+                    <ion-col class="ion-text-center">
+                      <img src="../../../assets/deal.png" />
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="ion-text-center">
+                      <h3>No targeted sales set.</h3>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-card-content>
+            </ion-card>
+            <!-- EXIST TARGETED SALES -->
+            <div *ngIf="outlet.goals.length !== 0 || salesTarget !== undefined">
+              <ion-card style="height: 310px" *ngIf="!isExpiredTarget(salesTarget)">
+                <ion-card-header>
+                  <ion-item lines="none" style="margin-top: -10px">
+                    <ion-card-subtitle>SALES</ion-card-subtitle>
+                    <ion-item *ngIf="isAfter(salesTarget.goalStartDate)">
+                      <ion-badge slot="start" color="danger"> UPCOMING at {{salesTarget.goalStartDate | date}}</ion-badge>
+                    </ion-item>
+                    <ion-button
+                      (click)="goToEditGoalModal(salesTarget)"
+                      fill="clear"
+                      slot="end"
+                      >Amend</ion-button
+                    >
+                  </ion-item>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-grid>
+                    <ion-row>
+                      <ion-col size="6">
+                        <div class="positionRelative">
+                          <round-progress
+                            style="margin: 0px auto"
+                            [(current)]="actualSales"
+                            [max]="salesTarget.targetAmount"
+                            [animation]="'easeInOutQuart'"
+                            [color]="salesTarget.color"
+                            [radius]="70"
+                          ></round-progress>
+                          <div
+                            class="percentageValue"
+                            [style.color]="salesTarget.color"
+                          >
+                            {{ (actualSales / salesTarget.targetAmount) * 100 |
+                            number:'1.0-0'}}%
+                          </div>
+                        </div>
+                      </ion-col>
+                      <ion-col size="6">
+                        <ion-item lines="none">
+                          <h1
+                            *ngIf="salesTarget.goalPeriod === 'DAILY'"
+                            [style.color]="salesTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Daily Sales Target
+                          </h1>
+                          <h1
+                            *ngIf="salesTarget.goalPeriod === 'WEEKLY'"
+                            [style.color]="salesTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Weekly Sales Target
+                          </h1>
+                          <h1
+                            *ngIf="salesTarget.goalPeriod === 'MONTHLY'"
+                            [style.color]="salesTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Monthly Sales Target
+                          </h1>
+                          <h1
+                            *ngIf="salesTarget.goalPeriod === 'YEARLY'"
+                            [style.color]="salesTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Yearly Sales Target
+                          </h1>
+                          <h1
+                            *ngIf="salesTarget.goalPeriod === 'TARGETED'"
+                            [style.color]="salesTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Sales Target
+                            <p>By {{salesTarget.goalEndDate | date}}</p>
+                          </h1>
+                        </ion-item>
+                        <ion-item lines="none" style="padding-top: 10px;">
+                          <h2 style='font-size: 30px;'>{{actualSales}}/{{salesTarget.targetAmount}}
+                            <p *ngIf="salesTarget.targetAmount > actualSales"
+                              style='padding-top: 10%; margin-top: 16px; font-weight: 600; color: #C0C0C0'> {{ salesTarget.targetAmount -
+                              actualSales }} more to go!</p>
+                            <p *ngIf="salesTarget.targetAmount <= actualSales"
+                              style='padding-top: 10%; font-weight: 600; color: #C0C0C0'> You have reached your target
+                              sales!</p>
+                              <div *ngIf="salesTarget.goalPeriod !== 'TARGETED'">
+                                <ion-chip *ngIf="actualSales > salesTarget.prevSales" color="success" style="height:18%; margin-left: -5px; ">
+                                  <ion-icon name="arrow-up-outline" color="success"></ion-icon>
+                                  <span>{{((actualSales - salesTarget.prevSales) / this.salesTarget.targetAmount) * 100 | number:'1.2-2'}}% from
+                                    <span *ngIf="salesTarget.goalPeriod === 'DAILY'">yesterday.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'WEEKLY'">last week.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'MONTHLY'">last month.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'YEARLY'">last year.</span>
+                                  </span>
+                                </ion-chip>
+                                <ion-chip *ngIf="actualSales < salesTarget.prevSales" color="danger" style="height:20%; margin-left: -5px;">
+                                  <ion-icon name="arrow-down-outline" color="danger"></ion-icon>
+                                  <span>{{((actualSales - salesTarget.prevSales) / this.salesTarget.targetAmount) * 100 | number:'1.2-2'}}% from
+                                    <span *ngIf="salesTarget.goalPeriod === 'DAILY'">yesterday.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'WEEKLY'">last week.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'MONTHLY'">last month.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'YEARLY'">last year.</span>
+                                  </span>
+                                </ion-chip>
+                                <ion-chip *ngIf="actualSales === salesTarget.prevSales" color="warning" style="height:20%; margin-left: -5px;">
+                                  <span>0% from
+                                    <span *ngIf="salesTarget.goalPeriod === 'DAILY'">yesterday.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'WEEKLY'">last week.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'MONTHLY'">last month.</span>
+                                    <span *ngIf="salesTarget.goalPeriod === 'YEARLY'">last year.</span>
+                                  </span>
+                                </ion-chip>
+                                </div>
+                          </h2>
+                        </ion-item>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </ion-card-content>
+              </ion-card>
+              <!-- EXPIRED TARGETED SALES -->
+              <ion-card style="height: 310px" *ngIf="isExpiredTarget(salesTarget)">
+                <ion-card-header>
+                  <ion-item lines="none" style="margin-top: -10px">
+                    <ion-card-subtitle>SALES</ion-card-subtitle>
+                    <ion-button
+                      (click)="goToEditGoalModal(salesTarget)"
+                      fill="clear"
+                      slot="end"
+                      >Set New</ion-button
+                    >
+                  </ion-item>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-grid style="margin-top: -25px">
+                    <ion-row>
+                      <ion-col class="ion-text-center">
+                        <img src="../../../assets/expired.png" />
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                  <h1
+                    style="
+                      font-family: Gill Sans, sans-serif;
+                      text-align: center;
+                    "
+                    [style.color]="salesTarget.color"
+                  >
+                    Your sales target has expired.
+                  </h1>
+                  <ion-list
+                    style="width: 70%"
+                    style="width: 80%; margin: 0px auto"
+                  >
+                    <ion-list-header>
+                      <ion-label
+                        >{{ (actualSales / salesTarget.targetAmount) * 100 |
+                        number:'1.0-0'}}% ( {{actualSales}} / {{ salesTarget.targetAmount }} )
+                        <ion-text
+                          style="
+                            font-size: 11px;
+                            padding-left: 5px;
+                            color: #bebebe;
+                          "
+                          >Sales hit from {{salesTarget.goalStartDate | date}}
+                          to {{salesTarget.goalEndDate | date}}
+                        </ion-text>
+                      </ion-label>
+                    </ion-list-header>
+
+                    <!-- Progress Bar with Color -->
+                    <ion-progress-bar
+                      [style.--progress-background]="salesTarget.color"
+                      style="--background: #e8e8e8"
+                      [value]="(actualSales / salesTarget.targetAmount)"
+                    ></ion-progress-bar>
+                  </ion-list>
+                </ion-card-content>
+              </ion-card>
+            </div>
+          </ion-col>
+          <!-- NO TARGETED EARNINGS -->
+          <ion-col size="6">
+            <ion-card style="height: 310px" *ngIf="outlet.goals.length === 0 || this.earningsTarget === undefined">
+              <ion-card-header>
+                <ion-item lines="none" style="margin-top: -10px">
+                  <ion-card-subtitle>EARNINGS</ion-card-subtitle>
+                  <ion-button
+                    (click)="openAddGoalModal('EARNINGS')"
+                    fill="clear"
+                    slot="end"
+                    >Set now</ion-button
+                  >
+                </ion-item>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-grid style="margin-top: -25px">
+                  <ion-row>
+                    <ion-col class="ion-text-center">
+                      <img src="../../../assets/earning.png" />
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="ion-text-center">
+                      <h3>No targeted earnings set.</h3>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-card-content>
+            </ion-card>
+            <!-- EXIST TARGETED EARNINGS -->
+            <div *ngIf="earningsTarget !== undefined">
+              <ion-card style="height: 310px" *ngIf="!isExpiredTarget(earningsTarget)">
+                <ion-card-header>
+                  <ion-item lines="none" style="margin-top: -10px">
+                    <ion-card-subtitle>EARNINGS</ion-card-subtitle>
+                    <ion-item *ngIf="isAfter(earningsTarget.goalStartDate)">
+                      <ion-badge slot="start" color="danger"> UPCOMING at {{earningsTarget.goalStartDate | date}}</ion-badge>
+                    </ion-item>
+                    <ion-button
+                      (click)="goToEditGoalModal(earningsTarget)"
+                      fill="clear"
+                      slot="end"
+                      >Amend</ion-button
+                    >
+                  </ion-item>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-grid>
+                    <ion-row>
+                      <ion-col size="6">
+                        <div class="positionRelative">
+                          <round-progress
+                            style="margin: 0px auto"
+                            [current]="actualEarnings"
+                            [max]="earningsTarget.targetAmount"
+                            [animation]="'easeInOutQuart'"
+                            [color]="earningsTarget.color"
+                            [radius]="70"
+                          ></round-progress>
+                          <div
+                            class="percentageValue"
+                            [style.color]="earningsTarget.color"
+                          >
+                            {{ (actualEarnings / earningsTarget.targetAmount) *
+                            100 | number:'1.0-0' }}%
+                          </div>
+                        </div>
+                      </ion-col>
+                      <ion-col size="6">
+                        <ion-item lines="none">
+                          <h1
+                            *ngIf="earningsTarget.goalPeriod === 'DAILY'"
+                            [style.color]="earningsTarget.color"
+                            style="font-size: 25px"
+                          >
+                           Daily Earnings Target
+                          </h1>
+                          <h1
+                            *ngIf="earningsTarget.goalPeriod === 'WEEKLY'"
+                            [style.color]="earningsTarget.color"
+                            style="font-size: 25px"
+                          >  Weekly Earnings Target
+                          </h1>
+                          <h1
+                            *ngIf="earningsTarget.goalPeriod === 'MONTHLY'"
+                            [style.color]="earningsTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Monthly Earnings Target
+                          </h1>
+                          <h1
+                            *ngIf="earningsTarget.goalPeriod === 'YEARLY'"
+                            [style.color]="earningsTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Yearly Earnings Target
+                          </h1>
+                          <h1
+                            *ngIf="earningsTarget.goalPeriod === 'TARGETED'"
+                            [style.color]="earningsTarget.color"
+                            style="font-size: 25px"
+                          >
+                            Earnings Target
+                            <p>By {{earningsTarget.goalEndDate | date}}</p>
+                          </h1>
+                        </ion-item>
+                        <ion-item lines="none" style="padding-top: 10px;">
+                          <h2 style='font-size: 30px;'> {{actualEarnings | number:'1.2-2'}}/{{earningsTarget.targetAmount}}
+                            <p *ngIf="earningsTarget.targetAmount > actualEarnings"
+                              style='padding-top: 10%; font-weight: 600; color: #C0C0C0'> ${{
+                              earningsTarget.targetAmount
+                              - actualEarnings | number:'1.2-2' }} more to go!</p>
+                            <p *ngIf="earningsTarget.targetAmount <= actualEarnings"
+                              style='padding-top: 10%; font-weight: 600; color: #C0C0C0'> You have reached your target
+                              earnings!</p>
+                              <div *ngIf="earningsTarget.goalPeriod !== 'TARGETED'">
+                                <ion-chip *ngIf="actualEarnings > earningsTarget.prevEarnings" color="success" style="height:20%; margin-left: -5px;">
+                                  <ion-icon name="arrow-up-outline" color="success"></ion-icon>
+                                  <span>{{((actualEarnings - earningsTarget.prevEarnings) / earningsTarget.targetAmount) * 100 | number:'1.2-2'}}% from
+                                    <span *ngIf="earningsTarget.goalPeriod === 'DAILY'">yesterday.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'WEEKLY'">last week.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'MONTHLY'">last month.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'YEARLY'">last year.</span>
+                                  </span>
+                                </ion-chip>
+                                <ion-chip *ngIf="actualEarnings < earningsTarget.prevEarnings" color="danger" style="height:20%; margin-left: -5px;">
+                                  <ion-icon name="arrow-down-outline" color="danger"></ion-icon>
+                                  <span>{{((actualEarnings - earningsTarget.prevEarnings) / earningsTarget.targetAmount) * 100 | number:'1.2-2'}}% from
+                                    <span *ngIf="earningsTarget.goalPeriod === 'DAILY'">yesterday.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'WEEKLY'">last week.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'MONTHLY'">last month.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'YEARLY'">last year.</span>
+                                  </span>
+                                </ion-chip>
+                                <ion-chip *ngIf="actualEarnings === earningsTarget.prevEarnings" color="warning" style="height:20%; margin-left: -5px;">
+                                  <span>0% from
+                                    <span *ngIf="earningsTarget.goalPeriod === 'DAILY'">yesterday.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'WEEKLY'">last week.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'MONTHLY'">last month.</span>
+                                    <span *ngIf="earningsTarget.goalPeriod === 'YEARLY'">last year.</span>
+                                  </span>
+                                </ion-chip>
+                              </div>
+                          </h2>
+                        </ion-item>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </ion-card-content>
+              </ion-card>
+              <!-- EXPIRED TARGETED EARNINGS -->
+              <ion-card style="height: 310px" *ngIf="isExpiredTarget(earningsTarget)">
+                <ion-card-header>
+                  <ion-item lines="none" style="margin-top: -10px">
+                    <ion-card-subtitle>EARNINGS</ion-card-subtitle>
+                    <ion-button
+                      (click)="goToEditGoalModal(earningsTarget)"
+                      fill="clear"
+                      slot="end"
+                      >Set New</ion-button
+                    >
+                  </ion-item>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-grid style="margin-top: -25px">
+                    <ion-row>
+                      <ion-col class="ion-text-center">
+                        <img src="../../../assets/expired.png" />
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                  <h1
+                    style="
+                      font-family: Gill Sans, sans-serif;
+                      text-align: center;
+                    "
+                    [style.color]="earningsTarget.color"
+                  >
+                    Your earnings target has expired.
+                  </h1>
+                  <ion-list
+                    style="width: 70%"
+                    style="width: 80%; margin: 0px auto"
+                  >
+                    <ion-list-header>
+                      <ion-label>{{ (actualEarnings / earningsTarget.targetAmount) * 100 | number:'1.0-0' }}% ( {{actualEarnings}} / {{ earningsTarget.targetAmount }} )
+                        <ion-text style="font-size:11px; padding-left: 5px; color: #BEBEBE;">Earnings hit from
+                          {{earningsTarget.goalStartDate | date}} to {{earningsTarget.goalEndDate | date}}  </ion-text>
+                      </ion-label>
+                    </ion-list-header>
+
+                    <!-- Progress Bar with Color -->
+                    <ion-progress-bar
+                      [style.--progress-background]="earningsTarget.color"
+                      style="--background: #e8e8e8"
+                      [value]="(actualEarnings / earningsTarget.targetAmount)"
+                    ></ion-progress-bar>
+                  </ion-list>
+                </ion-card-content>
+              </ion-card>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+    <!-- MASTER VIEW -->
+    <div *ngIf="masterView">
+      <ion-card style="height: 330px">
+        <ion-slides pager="true" [options]="slideOpts">
+          <ion-slide *ngFor="let data of masterSales; let i = index">
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <ion-card-header>
+                    <ion-badge *ngIf="data.outlet.isMaster" color="primary"
+                      >MASTER</ion-badge
+                    >
+                    <ion-card-title style="text-align: center"
+                      >{{data.outlet.outletName}}</ion-card-title
+                    >
+                  </ion-card-header>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-card-content>
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col size="6">
+                          <div *ngIf="data.goal !== null">
+                            <ion-grid style="margin-top: -50px">
+                              <ion-row>
+                                <ion-col>
+                                  <h1 *ngIf="data.goal.goalPeriod === 'DAILY'" [style.color]="data.goal.color"
+                                    style="font-size: 20px;">Sales: Daily Target
+                                    <p>{{data.goal.goalStartDate | date}}</p>
+                                  </h1>
+                                  <h1 *ngIf="data.goal.goalPeriod === 'WEEKLY'" [style.color]="data.goal.color"
+                                    style="font-size: 20px;">Sales: Weekly Target
+                                    <p>{{data.goal.goalStartDate | date}} to {{data.goal.goalEndDate | date}}</p>
+                                  </h1>
+                                  <h1 *ngIf="data.goal.goalPeriod === 'MONTHLY'" [style.color]="data.goal.color"
+                                    style="font-size: 20px;">Sales: Monthly Target
+                                    <p>{{data.goal.goalStartDate | date}} to {{data.goal.goalEndDate | date}}</p>
+                                  </h1>
+                                  <h1 *ngIf="data.goal.goalPeriod === 'YEARLY'" [style.color]="data.goal.color"
+                                    style="font-size: 20px;">Sales: Yearly Target
+                                    <p>{{data.goal.goalStartDate | date}} to {{data.goal.goalEndDate | date}}</p>
+                                  </h1>
+                                  <h1 *ngIf="data.goal.goalPeriod === 'TARGETED'" [style.color]="data.goal.color"
+                                    style="font-size: 20px;">Sales: Specific Period Target
+                                    <p>{{data.goal.goalStartDate | date}} to {{data.goal.goalEndDate | date}} </p>
+                                  </h1>
+                                </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                <ion-col>
+                                  <div class="positionRelative">
+                                    <round-progress style="margin: 0px auto" [current]="data.sum"
+                                      [max]="data.goal.targetAmount" [animation]="'easeInOutQuart'"
+                                      [color]="data.goal.color" [radius]='60'></round-progress>
+                                    <div class="percentageValue" [style.color]="data.goal.color">
+                                      {{ (data.sum / data.goal.targetAmount) * 100 | number:'1.0-0' }}%
+                                    </div>
+                                  </div>
+                                </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                <ion-col class="ion-text-center">
+                                  <ion-text
+                                    >Current Progress: {{(data.sum)}}/{{
+                                    data.goal.targetAmount}}</ion-text
+                                  >
+                                  <p>
+                                    <ion-badge *ngIf="data.goal.targetAmount > data.sum" color="danger">Not Reached
+                                    </ion-badge>
+                                    <ion-badge *ngIf="data.goal.targetAmount <= data.sum" color="success">Reached
+                                    </ion-badge>
+                                  </p>
+                                </ion-col>
+                              </ion-row>
+                            </ion-grid>
+                          </div>
+                          <div *ngIf="data.goal === null">
+                            <ion-grid>
+                              <ion-row>
+                                <ion-col>
+                                  <img src="../../../assets/deal.png" />
+                                </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                <ion-col>
+                                  <p>No Sales Goal</p>
+                                </ion-col>
+                              </ion-row>
+                            </ion-grid>
+                          </div>
+                        </ion-col>
+                        <ion-col size="6">
+                          <div *ngIf="masterEarnings[i].goal === null || masterEarnings[i].goal === undefined">
+                            <ion-grid>
+                              <ion-row>
+                                <ion-col>
+                                  <img src="../../../assets/earning.png" />
+                                </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                <ion-col>
+                                  <p>No Earnings Goal</p>
+                                </ion-col>
+                              </ion-row>
+                            </ion-grid>
+                          </div>
+                          <div *ngIf="masterEarnings[i].goal !== null">
+                            <ion-grid style="margin-top: -50px">
+                              <ion-row>
+                                <ion-col>
+                                  <h1 *ngIf="masterEarnings[i].goal.goalPeriod === 'DAILY'"
+                                    [style.color]="masterEarnings[i].goal.color" style="font-size: 20px;">Earnings:
+                                    Daily Target
+                                    <p>{{masterEarnings[i].goal.goalStartDate | date}}</p></h1>
+                                  <h1 *ngIf="masterEarnings[i].goal.goalPeriod === 'WEEKLY'"
+                                    [style.color]="masterEarnings[i].goal.color" style="font-size: 20px;">Earnings:
+                                    Weekly Target
+                                    <p>{{masterEarnings[i].goal.goalStartDate | date}} to {{masterEarnings[i].goal.goalEndDate | date}}</p></h1>
+
+                                  <h1 *ngIf="masterEarnings[i].goal.goalPeriod === 'MONTHLY'"
+                                    [style.color]="masterEarnings[i].goal.color" style="font-size: 20px;">Earnings:
+                                    Monthly Target
+                                    <p>{{masterEarnings[i].goal.goalStartDate | date}} to {{masterEarnings[i].goal.goalEndDate | date}}</p></h1>
+                                  <h1 *ngIf="masterEarnings[i].goal.goalPeriod === 'YEARLY'"
+                                    [style.color]="masterEarnings[i].goal.color" style="font-size: 20px;">Earnings:
+                                    Yearly Target
+                                    <p>{{masterEarnings[i].goal.goalStartDate | date}} to {{masterEarnings[i].goal.goalEndDate | date}}</p></h1>
+                                  <h1 *ngIf="masterEarnings[i].goal.goalPeriod === 'TARGETED'"
+                                    [style.color]="masterEarnings[i].goal.color" style="font-size: 20px;">Earnings:
+                                    Specific Period Target
+                                    <p>{{masterEarnings[i].goal.goalStartDate | date}} to
+                                      {{masterEarnings[i].goal.goalEndDate | date}} </p>
+                                  </h1>
+                                </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                <ion-col>
+                                  <div class="positionRelative">
+                                    <round-progress style="margin: 0px auto" [current]="masterEarnings[i].earnings"
+                                      [max]="masterEarnings[i].goal.targetAmount" [animation]="'easeInOutQuart'"
+                                      [color]="masterEarnings[i].goal.color" [radius]='60'></round-progress>
+                                    <div class="percentageValue" [style.color]="masterEarnings[i].goal.color">
+                                      {{ (masterEarnings[i].earnings  / masterEarnings[i].goal.targetAmount) * 100 |
+                                      number:'1.0-0' }}%
+                                    </div>
+                                  </div>
+                                </ion-col>
+                              </ion-row>
+                              <ion-row>
+                                <ion-col class='ion-text-center'>
+                                  <ion-text>Current Progress: ${{(masterEarnings[i].earnings | number:'1.2-2')}} / ${{
+                                    masterEarnings[i].goal.targetAmount}}</ion-text>
+                                  <p>
+                                    <ion-badge *ngIf="masterEarnings[i].goal.targetAmount > masterEarnings[i].earnings"
+                                      color="danger">Not Reached</ion-badge>
+                                    <ion-badge *ngIf="masterEarnings[i].goal.targetAmount <= masterEarnings[i].earnings"
+                                      color="success">Reached</ion-badge>
+                                  </p>
+                                </ion-col>
+                              </ion-row>
+                            </ion-grid>
+                          </div>
+                        </ion-col>
+                      </ion-row>
+                    </ion-grid>
+                  </ion-card-content>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-slide>
+        </ion-slides>
+      </ion-card>
+    </div>
+  </div>
+  <div *ngIf="segmentModel === 'compare'">
+    <ion-grid>
+      <!-- LEADERBOARD RANKING -->
+      <div style="margin-top: -18px">
+        <ion-row>
+          <ion-col class="ion-text-center">
+            <img src="../../../assets/winner-comparative.png" style="width: 75px; margin-top: 10px;" />
+          </ion-col>
+        </ion-row>
+      <ion-row style="margin-top: -10px;">
+        <ion-col class='ion-text-center'>
+          <h1>Leaderboard Ranking</h1>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col col="6">
+          <ion-card style="height: auto;">
+            <ion-card-header>
+              <ion-grid style="padding: 0px;">
+                <ion-row>
+                  <ion-col>
+                    <ion-card-title>
+                      Sales Ranking
+                      <img *ngIf="currentLeaderboardSaleRank.rank === 1" style="width:20px; height: 20px;"
+                        src="../../../assets/medal1.png" />
+                      <img *ngIf="currentLeaderboardSaleRank.rank === 2" style="width:20px; height: 20px;"
+                        src="../../../assets/medal2.png" />
+                      <img *ngIf="currentLeaderboardSaleRank.rank === 3" style="width:20px; height: 20px;"
+                        src="../../../assets/medal3.png" />
+                    </ion-card-title>
+                    <ion-card-subtitle *ngIf="leaderboardSaleRankTypeCard === 'LAST_7_DAYS'">7 days</ion-card-subtitle>
+                    <ion-card-subtitle *ngIf="leaderboardSaleRankTypeCard === 'LAST_30_DAYS'">30 days</ion-card-subtitle>
+                    <ion-card-subtitle *ngIf="leaderboardSaleRankTypeCard === 'LAST_60_DAYS'">60 days</ion-card-subtitle>
+                    <ion-card-subtitle *ngIf="leaderboardSaleRankTypeCard === 'OVERALL'">Overall</ion-card-subtitle>
+                  </ion-col>
+                  <ion-col class="ion-text-right" size="2">
+                    <ion-button (click)="getSalesLeaderboardRanking(true)" fill="clear">
+                      <ion-icon name="timer-outline"></ion-icon>
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-grid>
+                <ion-row>
+                  <ion-col size='6'>
+                    <ion-row>
+                      <ion-col>
+                        Rank:
+                      </ion-col>
+                    </ion-row>
+                    <ion-row>
+                      <ion-col class='ion-text-right'>
+                        <h1 *ngIf="currentLeaderboardSaleRank.rank !== -1" style="font-size: 45px;">{{
+                          currentLeaderboardSaleRank.rank }}</h1>
+                        <h1 *ngIf="currentLeaderboardSaleRank.rank === -1" style="font-size: 26px; margin-top: 10px;">Not Applicable</h1>
+                      </ion-col>
+                    </ion-row>
+                  </ion-col>
+                  <ion-col size='6'>
+                    <ion-row>
+                      <ion-col>
+                        Sales:
+                      </ion-col>
+                    </ion-row>
+                    <ion-row>
+                      <ion-col class='ion-text-right'>
+                        <h1 style="font-size: 45px;">{{ currentLeaderboardSaleRank.numOfSales }}</h1>
+                      </ion-col>
+                    </ion-row>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col col="6">
+          <ion-card style="height: auto;">
+            <ion-card-header>
+              <ion-grid style="padding: 0px;">
+                <ion-row>
+                  <ion-col>
+                    <ion-card-title>Favourites Ranking</ion-card-title>
+                    <ion-card-subtitle>Overall</ion-card-subtitle>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-grid>
+                <ion-row>
+                  <ion-col size='6'>
+                    <ion-row>
+                      <ion-col>
+                        Rank:
+                      </ion-col>
+                    </ion-row>
+                    <ion-row>
+                      <ion-col class='ion-text-right'>
+                        <h1 *ngIf="currentLeaderboardFavouriteRank.rank !== -1" style="font-size: 45px;">{{
+                          currentLeaderboardFavouriteRank.rank }}</h1>
+                        <h1 *ngIf="currentLeaderboardFavouriteRank.rank === -1"
+                          style="font-size: 26px; margin-top: 10px;">Not Applicable</h1>
+                      </ion-col>
+                    </ion-row>
+                  </ion-col>
+                  <ion-col size='6'>
+                    <ion-row>
+                      <ion-col>
+                        Favourites:
+                      </ion-col>
+                    </ion-row>
+                    <ion-row>
+                      <ion-col class='ion-text-right'>
+                        <h1 style="font-size: 45px;">{{ currentLeaderboardFavouriteRank.numOfFavourites }}</h1>
+                      </ion-col>
+                    </ion-row>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </div>
+      <!-- CHART -->
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-card>
+              <ion-card-header class="ion-text-center">
+                <ion-card-title><h1>Comparative Analysis</h1></ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div *ngIf="allHawkerSalesRank.length !== 0 || allFoodItemSalesRank.length > 1">
+                <ion-row>
+                  <ion-col>
+                    <ion-item>
+                      <ion-label>Cuisine Type</ion-label>
+                      <ion-select [(ngModel)]="selectedCuisineType" (ionChange)="updateGraph()">
+                        <ion-select-option *ngFor="let cuisine of outlet.cuisineType" [value]="cuisine">{{cuisine}}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item>
+                      <ion-label>Time Frame</ion-label>
+                      <ion-select [(ngModel)]="selectedTimeFrame" (ionChange)="updateGraph()">
+                        <ion-select-option *ngFor="let time of timeFrameSelections" [value]="time.value">{{time.label}}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-card>
+              <ion-card-header class="ion-text-center">
+                <ion-card-title style="color: darkgray; font-weight: bold; font-size: medium">Sales Comparative Analysis
+                </ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <!-- <div style="width: 100%" echarts [initOpts]="barChartOpts" [options]="barChartOptions"></div> -->
+                <app-echarts-comparative-graph *ngIf="allHawkerSalesRank.length > 0 && selectedCuisineType !== null" [results]="allHawkerSalesRank" [timeFormat]="selectedTimeFrame" [actualRank]="actualHawkerSalesRank"></app-echarts-comparative-graph>
+                <div *ngIf="allHawkerSalesRank.length === 0 || selectedCuisineType === null">
+                  <div class ="ion-text-center" style="color: grey; margin: 0px auto;">
+                    <img src="./assets/Logo - Black.svg" style="opacity: 0.5; width: 200px;"/>
+                    <h1>No data available</h1>
+                  </div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-card>
+              <ion-card-header>
+                <ion-grid>
+                  <ion-row>
+                    <ion-col class='ion-text-left'>
+                      <ion-item lines="none">
+                        <ion-badge slot="start" color="light" style="margin-top: -20px;">Value '0' in chart indicates no sales for the period</ion-badge>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col class='ion-text-center'>
+                      <ion-card-title style="color: darkgray; font-weight: bold; font-size: medium;">Food Item Comparative Analysis
+                      </ion-card-title>
+                    </ion-col>
+                    <ion-col></ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-card-header>
+              <ion-card-content>
+                <app-echarts-comparative-fooditem-chart *ngIf="allFoodItemSalesRank.length > 1" [names]="allFoodItemName" [allFoodRank]="foodItemsRank" [results]= "allFoodItemSalesRank"></app-echarts-comparative-fooditem-chart>
+                <div *ngIf="allFoodItemSalesRank.length <= 1">
+                  <div class ="ion-text-center" style="color: grey; margin: 0px auto; top: 200;">
+                    <img src="./assets/Logo - Black.svg" style="opacity: 0.5; width: 200px;"/>
+                    <h1>No data available</h1>
+                  </div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-grid>
+  </div>
+</ion-content>

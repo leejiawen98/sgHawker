@@ -1,0 +1,280 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close" style="color: white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="color: white;">
+        Delivery Demand
+      </ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header> 
+
+<ion-content fullscreen>
+  <br>
+  <ion-row>
+
+    <ion-card *ngIf="this.leaderboardCentresNames !== undefined" style = "width: 100%;">
+      <ion-grid>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+          <ion-card-title *ngIf="deliveryDemandCentreFilter === undefined || deliveryDemandCentreFilter === 'month'">
+            Highest Delivery Demand (This Month)
+          </ion-card-title>
+          <ion-card-title *ngIf="deliveryDemandCentreFilter === 'day'">
+            Highest Delivery Demand (Today)
+          </ion-card-title>
+          <ion-card-title *ngIf="deliveryDemandCentreFilter === 'week'">
+            Highest Delivery Demand (This Week)
+          </ion-card-title>
+          <ion-card-content>
+            <ion-row>
+              <!-- 2nd place -->
+              <ion-col size="3.5">
+                <div
+                  class="ribbon-container"
+                  *ngIf="this.leaderboardCentresNames !== undefined && this.leaderboardCentresNames.length >1"
+                >
+                  <ion-avatar class="silver">
+                    <img
+                      
+                      src="https://avatars.dicebear.com/api/initials/{{this.leaderboardCentresNames[1]}}.svg"
+                      onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                    />
+                  </ion-avatar>
+                  <img class="img-button" src="../../../assets/medal2.png" />
+                </div>
+                <div *ngIf="this.leaderboardCentresNames !== undefined && this.leaderboardCentresNames.length >1">
+                  <p
+                    style="font-weight: bolder; margin-top: 20px"
+                    class="ion-text-center"
+                  >
+                  {{this.leaderboardCentresNames[1]}}
+                  </p>
+                </div>
+              </ion-col>
+      
+              <!-- 1st place -->
+              <ion-col size="5">
+                <div
+                  class="ribbon-container"
+                  *ngIf="this.leaderboardCentresNames !== undefined && this.leaderboardCentresNames.length >0"
+                >
+                  <ion-avatar class="gold">
+                    <img
+                      
+                      src="https://avatars.dicebear.com/api/initials/{{this.leaderboardCentresNames[0]}}.svg"
+                      onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                    />
+                  </ion-avatar>
+                  <img class="img-button" src="../../../assets/medal1.png" />
+                </div>
+                <div *ngIf="this.leaderboardCentresNames !== undefined && this.leaderboardCentresNames.length >0">
+                  <p
+                    style="font-weight: bolder; margin-top: 20px"
+                    class="ion-text-center"
+                  >
+                  {{this.leaderboardCentresNames[0]}}
+                  </p>
+                </div>
+              </ion-col>
+      
+              
+              <ion-col size="3.5">
+                <div 
+                  class="ribbon-container"
+                  *ngIf="this.leaderboardCentresNames !== undefined && this.leaderboardCentresNames.length >2"
+                >
+                  <ion-avatar class="bronze">
+                    <img
+                      
+                      src="https://avatars.dicebear.com/api/initials/{{this.leaderboardCentresNames[2]}}.svg"
+                      onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                    />
+                  </ion-avatar>
+                  <img class="img-button" src="../../../assets/medal3.png" />
+                </div>
+                <div *ngIf="this.leaderboardCentresNames !== undefined && this.leaderboardCentresNames.length >2">
+                  <p
+                    style="font-weight: bolder; margin-top: 20px"
+                    class="ion-text-center"
+                  >
+                  {{this.leaderboardCentresNames[2]}}
+                  </p></div>
+              </ion-col>
+            </ion-row>
+        </ion-card-content>
+      </ion-col>
+        </ion-row>
+      </ion-grid> 
+    </ion-card>
+  
+    <ion-card style="width: 100%;">
+      <ion-grid>
+        <ion-row class="ion-align-items-center" *ngIf ="this.leaderboardCentresNames !== undefined ">
+          <ion-col size = "9">
+            <!-- <ion-row *ngIf ="this.leaderboardCentresNames.length >0 ">1st : {{this.leaderboardCentresNames[0]}}</ion-row>
+            <ion-row *ngIf ="this.leaderboardCentresNames.length >1 ">2nd : {{this.leaderboardCentresNames[1]}}</ion-row>
+            <ion-row *ngIf ="this.leaderboardCentresNames.length >2 ">3rd : {{this.leaderboardCentresNames[2]}}</ion-row> -->
+    
+          </ion-col>
+        <ion-col size = "1" style="margin-left: 10%;">
+          <ion-button class="button-has-icon-only" fill="clear" (click)="dateSelect.open()">
+            <ion-icon name="filter"> </ion-icon>
+          </ion-button>
+          <ion-select [(ngModel)]="deliveryDemandCentreFilter" #dateSelect class="ion-hide" (ionChange)="filterDeliveryDemandCentre();"
+            >
+            <ion-select-option value="day">Today</ion-select-option>
+          <ion-select-option value="week">This Week</ion-select-option>
+          <ion-select-option value="month">This Month</ion-select-option>
+          </ion-select>
+        </ion-col>
+        </ion-row>
+      <ion-row class="ion-align-items-center">
+        <ion-col>
+        <ion-card-content>
+          <br>
+            <div echarts [options]="deliveryDemandCentresOption"></div>
+            <br>
+            
+        </ion-card-content>
+    </ion-col>
+    </ion-row>
+    </ion-grid>
+  </ion-card>
+
+  <ion-card *ngIf="this.leaderboardOutletNames !== undefined" style = "width: 100%;">
+    <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+        <ion-card-title *ngIf="deliveryDemandOutletFilter === undefined || deliveryDemandOutletFilter === 'month'">
+          Highest Delivery Demand (This Month)
+        </ion-card-title>
+        <ion-card-title *ngIf="deliveryDemandOutletFilter === 'day'">
+          Highest Delivery Demand (Today)
+        </ion-card-title>
+        <ion-card-title *ngIf="deliveryDemandOutletFilter === 'week'">
+          Highest Delivery Demand (This Week)
+        </ion-card-title>
+        <ion-card-content>
+          <ion-row>
+            <!-- 2nd place -->
+            <ion-col size="3.5">
+              <div
+                class="ribbon-container"
+                *ngIf="this.leaderboardOutletNames !== undefined && this.leaderboardOutletNames.length >1"
+              >
+                <ion-avatar class="silver">
+                  <img
+                    
+                    src="https://avatars.dicebear.com/api/initials/{{this.leaderboardOutletNames[1]}}.svg"
+                    onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                  />
+                </ion-avatar>
+                <img class="img-button" src="../../../assets/medal2.png" />
+              </div>
+              <div *ngIf="this.leaderboardOutletNames !== undefined && this.leaderboardOutletNames.length >1">
+                <p
+                  style="font-weight: bolder; margin-top: 20px"
+                  class="ion-text-center"
+                >
+                {{this.leaderboardOutletNames[1]}}
+                </p>
+              </div>
+            </ion-col>
+    
+            <!-- 1st place -->
+            <ion-col size="5">
+              <div
+                class="ribbon-container"
+                *ngIf="this.leaderboardOutletNames !== undefined && this.leaderboardOutletNames.length >0"
+              >
+                <ion-avatar class="gold">
+                  <img
+                    
+                    src="https://avatars.dicebear.com/api/initials/{{this.leaderboardOutletNames[0]}}.svg"
+                    onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                  />
+                </ion-avatar>
+                <img class="img-button" src="../../../assets/medal1.png" />
+              </div>
+              <div *ngIf="this.leaderboardOutletNames !== undefined && this.leaderboardOutletNames.length >0">
+                <p
+                  style="font-weight: bolder; margin-top: 20px"
+                  class="ion-text-center"
+                >
+                {{this.leaderboardOutletNames[0]}}
+                </p>
+              </div>
+            </ion-col>
+    
+            
+            <ion-col size="3.5">
+              <div 
+                class="ribbon-container"
+                *ngIf="this.leaderboardOutletNames !== undefined && this.leaderboardOutletNames.length >2"
+              >
+                <ion-avatar class="bronze">
+                  <img
+                    
+                    src="https://avatars.dicebear.com/api/initials/{{this.leaderboardOutletNames[2]}}.svg"
+                    onerror="this.src='/assets/sgHawkerAppIcon.svg';"
+                  />
+                </ion-avatar>
+                <img class="img-button" src="../../../assets/medal3.png" />
+              </div>
+              <div *ngIf="this.leaderboardOutletNames !== undefined && this.leaderboardOutletNames.length >2">
+                <p
+                  style="font-weight: bolder; margin-top: 20px"
+                  class="ion-text-center"
+                >
+                {{this.leaderboardOutletNames[2]}}
+                </p></div>
+            </ion-col>
+          </ion-row>
+      </ion-card-content>
+    </ion-col>
+      </ion-row>
+    </ion-grid> 
+  </ion-card>
+
+  <ion-card style="width: 100%;">
+    <ion-grid>
+      <ion-row class="ion-align-items-center" *ngIf ="this.leaderboardOutletNames !== undefined ">
+        <ion-col size = "9">
+        <!-- <ion-row *ngIf ="this.leaderboardOutletNames.length >0 ">1st : {{this.leaderboardOutletNames[0]}}</ion-row>
+        <ion-row *ngIf ="this.leaderboardOutletNames.length >1 ">2nd : {{this.leaderboardOutletNames[1]}}</ion-row>
+        <ion-row *ngIf ="this.leaderboardOutletNames.length >2 ">3rd : {{this.leaderboardOutletNames[2]}}</ion-row> -->
+
+      </ion-col>
+      <ion-col size = "1" style="margin-left: 10%;">
+        <ion-button class="button-has-icon-only" fill="clear" (click)="dateSelecting.open()">
+          <ion-icon name="filter"> </ion-icon>
+        </ion-button>
+        <ion-select [(ngModel)]="deliveryDemandOutletFilter" #dateSelecting class="ion-hide" (ionChange)="filterDeliveryDemandOutlet();"
+          >
+          <ion-select-option value="day">Today</ion-select-option>
+        <ion-select-option value="week">This Week</ion-select-option>
+        <ion-select-option value="month">This Month</ion-select-option>
+        </ion-select>
+      </ion-col>
+      </ion-row>
+    <ion-row class="ion-align-items-center">
+      <ion-col>
+      <ion-card-content>
+        <br>
+          <div echarts [options]="deliveryDemandOutletsOption"></div>
+        <br>
+        
+      </ion-card-content>
+  </ion-col>
+  </ion-row>
+  </ion-grid>
+</ion-card>
+  
+  </ion-row>
+
+</ion-content>

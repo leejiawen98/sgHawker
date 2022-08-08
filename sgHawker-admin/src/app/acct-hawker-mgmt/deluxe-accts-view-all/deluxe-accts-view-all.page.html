@@ -1,0 +1,69 @@
+<ion-content>
+  <ion-text>
+    <h4 style="margin: 20px">View All Approved Deluxe Accounts</h4>
+  </ion-text>
+  <ion-card-content>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <table
+            *ngIf="approvedUpgradeAccounts.length > 0"
+            datatable="ng"
+            [dtOptions]="dtOptions"
+            class="row-border hover"
+          >
+            <thead>
+              <tr>
+                <th>Account Name</th>
+                <th>Email</th>
+                <th>Current Account Tier</th>
+                <th>Deluxe Account Upgrade Status</th>
+                <th>Documents</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody style="text-align: center">
+              <tr *ngFor="let hawker of approvedUpgradeAccounts">
+                <td>{{ hawker.name }}</td>
+                <td>{{ hawker.email }}</td>
+                <td [ngSwitch]="hawker.accountTier">
+                  <ion-badge *ngSwitchCase="'FREE'">FREE</ion-badge>
+                  <ion-badge color="primary" *ngSwitchCase="'PREMIUM'"
+                    >PREMIUM</ion-badge
+                  >
+                  <ion-badge color="tertiary" *ngSwitchCase="'DELUXE'"
+                    >DELUXE</ion-badge
+                  >
+                </td>
+                <td [ngSwitch]="hawker.accountUpgradeStatus">
+                  <ion-badge color="warning" *ngSwitchCase="'PENDING'">
+                    {{hawker.accountUpgradeStatus}}
+                  </ion-badge>
+                  <ion-badge color="success" *ngSwitchCase="'APPROVED'">
+                    {{hawker.accountUpgradeStatus}}
+                  </ion-badge>
+                  <ion-badge color="primary" *ngSwitchDefault
+                    >{{hawker.accountUpgradeStatus}}</ion-badge
+                  >
+                </td>
+                <td>
+                  <ion-button (click)="downloadDocuments(hawker.email)">
+                    <ion-icon name="download" slot="start"> </ion-icon>
+                    Download
+                  </ion-button>
+                </td>
+                <td>
+                  <ion-button
+                    class="button-outline"
+                    (click)="goToDetailsPage(hawker._id)"
+                    >View Details</ion-button
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-content>

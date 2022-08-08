@@ -1,0 +1,26 @@
+.demo-chart {
+  height: 400px;
+  width: 100%;
+}
+
+.chart-wrapper {
+  display: flex;
+}
+
+.noData {
+  height: 400px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // font-size: xx-large;
+  // color: rgb(221, 221, 221);
+}
+
+.info-box {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgb(233, 233, 233);
+  border-radius: 20px;
+  padding: 3px 12px 3px 6px;
+}

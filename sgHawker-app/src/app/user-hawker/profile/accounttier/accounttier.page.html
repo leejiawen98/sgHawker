@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-buttons slot="start" class="hawker-toolbar-button">
+      <ion-back-button defaultHref="/hawker/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="hawker-toolbar-title">Subscription Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid *ngIf="hawker">
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-label>Subscription Tier: </ion-label>
+          <ion-badge
+            color="{{hawker.accountTier==='DELUXE' ? 'tertiary' : (hawker.accountTier === 'PREMIUM' ? 'primary' : 'medium')}}"
+            >{{hawker.accountTier}}</ion-badge
+          >
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="hawker.accountUpgradeStatus !== undefined">
+      <ion-col>
+        <ion-item
+          lines="{{hawker.accountUpgradeStatus === 'PENDING' ? 'none' : ''}}"
+        >
+          <ion-label>Account Upgrade Status: </ion-label>
+          <ion-badge
+            color="{{hawker.accountUpgradeStatus === 'PENDING' ? 'warning' : 'success'}}"
+          >
+            {{hawker.accountUpgradeStatus}}
+          </ion-badge>
+        </ion-item>
+        <ion-item
+          lines="none"
+          *ngIf="hawker.accountUpgradeStatus === 'PENDING'"
+        >
+          <ion-label></ion-label>
+          <ion-badge color="tertiary">For DELUXE</ion-badge>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <div *ngIf="currentWallet">
+      <ion-row *ngIf="creditCard !== undefined">
+        <ion-col>
+          <ion-item>
+            <ion-label> Credit Card: </ion-label>
+            <ion-text>
+              {{creditCard.cardName}}, {{creditCard.cardType}}
+              *{{creditCard.cardNumber.substr(creditCard.cardNumber.length-4)}}
+              [Default]
+            </ion-text>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row *ngIf="currentWallet.subscriptionPaymentDue !== null && currentWallet.subscriptionPaymentDue !== undefined">
+        <ion-col>
+          <ion-item>
+            <ion-label> Subscription Due End of Month: </ion-label>
+            <ion-text>
+              S${{currentWallet.subscriptionPaymentDue | number : '1.2-2'}}
+            </ion-text>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </div>
+    <div *ngIf="hawker.accountTier === 'DELUXE' && masterOutlet">
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label> Master Outlet: </ion-label>
+            <ion-text> {{masterOutlet.outletName}} </ion-text>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </div>
+    <ion-row
+      *ngIf="hawker.accountTier==='DELUXE' && masterOutlet?._id !== currentOutlet?._id"
+      class="ion-justify-content-center"
+    >
+      <ion-badge> Please change your plan in your master outlet </ion-badge>
+    </ion-row>
+    <ion-row
+      *ngIf="hawker.accountUpgradeStatus === 'PENDING'"
+      class="ion-justify-content-center"
+    >
+      <ion-badge> Account upgrade request is still pending </ion-badge>
+    </ion-row>
+    <br />
+    <ion-row class="ion-justify-content-center">
+      <ion-button
+        (click)="changePlan()"
+        disabled="{{hawker.accountUpgradeStatus === 'PENDING' || (hawker.accountTier==='DELUXE' && masterOutlet?._id !== currentOutlet?._id)}}"
+      >
+        Change Plan
+      </ion-button>
+    </ion-row>
+  </ion-grid>
+</ion-content>

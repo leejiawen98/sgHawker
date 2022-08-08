@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Pending Vaccinated Certificate</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click) = "dismissModal()" style="font-size: 20px;" fill="clear" >
+        <ion-icon style="color: white;" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="customerArr.length === 0">
+    <div class ="ion-text-center" style="color: grey; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+      <img src="../../../../assets/logo-black.svg" style="opacity: 0.5; width: 300px;"/>
+      <h1>No Pending Vaccination Certificate</h1>
+    </div>
+  </div>
+
+  <ion-grid *ngIf="customerArr.length !== 0">
+    <ion-row *ngFor="let customer of customerArr; let i = index">
+      <ion-card style="width: 100%; height: 60%;">
+        <ion-col>
+            <ion-item lines='full' style="margin-top: -10px;">
+              <ion-card-title>{{i + 1}}. {{customer.name}}</ion-card-title>
+              <ion-button (click)= "downloadVaccinationCert(customer)" slot="end">Download</ion-button>
+            </ion-item>
+          <ion-card-content>
+            <ion-grid>
+              <ion-row class='ion-text-center' *ngIf="customer.isVaccinated === false && this.textAfterButton[i] === undefined">
+                <ion-col>
+                  <ion-button (click)= "approveVaccinationCert(customer, i)"size='small' color='success'>Valid Certificate</ion-button>
+                </ion-col>
+                <ion-col>
+                  <ion-button (click)= "rejectVaccinationCert(customer, i)"size='small' color='danger'>Invalid Certificate</ion-button>
+                </ion-col>
+              </ion-row>
+              <ion-row class='ion-text-center' *ngIf="customer.isVaccinated === true || this.textAfterButton[i] !== undefined">
+                <ion-col>
+                  {{ textAfterButton[i] }}
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-col>
+      </ion-card>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>

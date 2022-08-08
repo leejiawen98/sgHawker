@@ -1,0 +1,20 @@
+.withBorder {
+  border: solid 1px black;
+}
+
+.header {
+  background-color: #ffe5b4;
+
+  ion-item {
+    --background: #ffe5b4;
+  }
+}
+
+.chart-wrapper {
+  display: flex;
+}
+
+.demo-chart {
+  height: 280px;
+  width: 100%;
+}

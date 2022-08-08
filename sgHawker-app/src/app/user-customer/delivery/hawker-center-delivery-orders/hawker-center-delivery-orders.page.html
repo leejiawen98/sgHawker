@@ -1,0 +1,224 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/customer/delivery"
+        style="color: white"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <ion-row class="ion-align-items-end ion-justify-content-center">
+        <img src="../../assets/Logo - White.svg" width="40%" height="30%" />
+      </ion-row>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="borderless-ion-card">
+          <img src="../../../assets/Logo - Black.svg" width="100%" />
+          <ion-card-title> {{hawkerCenterName}} </ion-card-title>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="ion-align-items-center">
+      <ion-col size="9">
+        <ion-searchbar
+          (ionChange)="searchData($event)"
+          placeholder="Search stalls..."
+        >
+        </ion-searchbar>
+      </ion-col>
+      <ion-col size="1" class="ion-justify-content-center">
+        <ion-button
+          class="button-has-icon-only"
+          fill="clear"
+          (click)="toggleFilterOptions()"
+        >
+          <ion-icon name="funnel-outline"> </ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col size="1">
+        <ion-button
+          class="button-has-icon-only"
+          fill="clear"
+          (click)="sortCategorySelect.open()"
+        >
+          <ion-icon name="filter"> </ion-icon>
+        </ion-button>
+        <ion-select
+          [(ngModel)]="selectedSortCategory"
+          #sortCategorySelect
+          class="ion-hide"
+          (ionChange)="sortList();"
+        >
+          <ion-select-option
+            *ngFor="let item of allSortCategories"
+            [value]="item"
+            >{{item}}
+          </ion-select-option>
+        </ion-select>
+      </ion-col>
+    </ion-row>
+
+    <div *ngIf="showFilterOptions">
+      <ion-list>
+        <ion-card class="borderless-ion-card ion-no-margin">
+          <ion-item lines="none">
+            <ion-label class="ion-no-margin" style="font-size: small"
+              >Delivery Fee</ion-label
+            >
+            <ion-range
+              min="0"
+              max="5"
+              dualKnobs="true"
+              [(ngModel)]="priceRangeValue"
+            >
+              <ion-label slot="start">{{ priceRangeValue.lower }}</ion-label>
+              <ion-label slot="end">{{ priceRangeValue.upper }}</ion-label>
+            </ion-range>
+          </ion-item>
+        </ion-card>
+        <ion-card class="borderless-ion-card ion-no-margin">
+          <ion-item lines="none">
+            <ion-label> Cuisine </ion-label>
+            <ion-select [(ngModel)]="selectedCuisines" multiple>
+              <ion-select-option
+                *ngFor="let cuisine of allCuisines"
+                [value]="cuisine"
+                >{{cuisine}}</ion-select-option
+              >
+            </ion-select>
+          </ion-item>
+        </ion-card>
+      </ion-list>
+      <ion-row class="ion-justify-content-center">
+        <ion-button color="success" (click)="applyFilter()">Apply</ion-button>
+        <ion-button color="warning" (click)="initFilterOptions()"
+          >Reset</ion-button
+        >
+      </ion-row>
+    </div>
+
+    <div *ngIf="recommendedOrders?.length > 0">
+      <ion-row>
+        <ion-col>
+          <ion-card class="borderless-ion-card header">
+            <ion-card-title style="font-size: 25px">
+              Recommended To Pick Up
+            </ion-card-title>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-slides
+            [options]="{ slidesPerView: 'auto', zoom: false, grabCursor: true }"
+          >
+            <app-recommended-delivery-card
+              *ngFor="let order of recommendedOrders"
+              [fromOutletPage]="true"
+              [recommendedOrder]="order"
+              (click)="openDeliveryOrderDetails(order)"
+            ></app-recommended-delivery-card>
+          </ion-slides>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-justify-content-end ion-align-items-center">
+        <ion-text
+          style="color: gray; margin-right: 8%"
+          (click)="showAllRecommended()"
+        >
+          See all
+        </ion-text>
+      </ion-row>
+    </div>
+
+    <ion-row>
+      <ion-col>
+        <ion-card class="borderless-ion-card">
+          <ion-card-title> Outlets </ion-card-title>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <div *ngIf="outletMap?.length === 0">
+      <ion-row class="ion-justify-content-center">
+        <ion-text>
+          <ion-icon
+            name="sad-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text *ngIf="noFilterResults" style="color: gray">
+          No orders based on your filter options
+        </ion-text>
+        <ion-text
+          *ngIf="!noFilterResults && noSearchResults"
+          style="color: gray"
+        >
+          No orders matching your search
+        </ion-text>
+        <ion-text
+          *ngIf="!noFilterResults && !noSearchResults"
+          style="color: gray"
+        >
+          There are no deliveries from this outlet currently.
+        </ion-text>
+      </ion-row>
+    </div>
+
+    <ion-row *ngIf="outletMap?.length > 0">
+      <ion-item-group *ngFor="let outlet of outletMap" style="width: 100%;">
+        <ion-item-divider>
+          <ion-label style="color: black; font-weight: bold;">{{ outlet.name }}</ion-label>
+        </ion-item-divider>
+        <ion-item *ngFor="let order of outlet.value" (click)="openDeliveryOrderDetails(order)">
+          <div style="display: flex; flex-direction: column">
+            <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+              {{ order.individualOrderItems?.length + order.foodBundleOrderItems?.length }} items
+            </ion-label>
+            <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+              Deliver to {{ order.deliveryAddress.addressDetails + ' ' + order.deliveryAddress.postalCode}}
+            </ion-label>
+            <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+              Pickup time: {{ order.orderPickUpTime | date: 'dd/MM/yy HH:mm' }}
+            </ion-label>
+            <ion-label class="ion-text-wrap" style="font-size: small; color: gray">
+              Delivery Fee: ${{ order.deliveryFee | currency: "USD" }}
+            </ion-label>
+            <ion-row class="ion-align-items-center">
+              <ion-badge color="warning" *ngFor="let type of order.outlet.cuisineType"
+                style="font-size: x-small; margin: 3px">
+                {{type}}
+              </ion-badge>
+            </ion-row>
+          </div>
+          <ion-thumbnail slot="end">
+            <img src="../../../assets/sgHawkerAppIcon.svg" />
+          </ion-thumbnail>
+        </ion-item>
+      </ion-item-group>
+    </ion-row>
+
+    <!-- <div *ngIf="allOrdersByHawkerCenter?.length <= 0">
+      <ion-row class="ion-justify-content-center">
+        <ion-text>
+          <ion-icon
+            name="bicycle-outline"
+            style="font-size: 100px; color: gray"
+          ></ion-icon>
+        </ion-text>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-text style="color: gray"> No delivery orders </ion-text>
+      </ion-row>
+    </div> -->
+  </ion-grid>
+</ion-content>

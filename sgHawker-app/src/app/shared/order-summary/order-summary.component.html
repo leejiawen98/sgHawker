@@ -1,0 +1,77 @@
+<ion-card *ngIf="order !== undefined" style="margin: 1%">
+  <ion-grid fixed>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-row class="ion-justify-content-between ion-align-items-center">
+          <ion-text color="dark" style="font-weight: bold; font-size: medium">
+            <ion-icon
+              name="bicycle-outline"
+              style="font-size: large"
+              *ngIf="orderView === 'deliverer'"
+            ></ion-icon>
+            <ion-icon
+              name="fast-food-outline"
+              style="font-size: large"
+              *ngIf="orderView === 'customer'"
+            ></ion-icon>
+            &nbsp;{{ order.outlet.outletName }}
+          </ion-text>
+
+          <div *ngIf="isCompletedOrder()">
+            <ion-badge color="light">
+              <ion-text style="color: black; font-size: small">
+                {{ order.orderCreationTime | date: "dd/MM" }}
+              </ion-text>
+            </ion-badge>
+          </div>
+
+          <div *ngIf="!isCompletedOrder()" [ngSwitch]="order.orderStatus">
+            <ion-badge *ngSwitchCase="'UNPAID'" color="warning">{{
+              order.orderStatus
+            }}</ion-badge>
+            <ion-badge *ngSwitchCase="'CANCELLED'" color="danger">{{
+              order.orderStatus
+            }}</ion-badge>
+            <ion-badge *ngSwitchDefault color="success">{{
+              order.orderStatus.split("_").join(" ")
+            }}</ion-badge>
+          </div>
+        </ion-row>
+      </ion-card-title>
+      <div style="padding-top: 1%"></div>
+      <ion-badge color="light">
+        <ion-text
+          style="color: black; font-size: small"
+          *ngIf="orderView === 'customer' && !isCompletedOrder()"
+        >
+          {{ order.orderCreationTime | date: "dd/MM" }}
+        </ion-text>
+        <ion-text
+          style="color: black; font-size: small"
+          *ngIf="orderView === 'deliverer' && !isCompletedOrder()"
+        >
+          {{ order.orderPickUpTime | date: "dd/MM" }}
+        </ion-text>
+      </ion-badge>
+      <ion-card-subtitle> {{ getTotalOrderItems() }} items </ion-card-subtitle>
+      <ion-row class="ion-align-items-center">
+        <ion-text
+          *ngIf="orderView === 'customer'"
+          color="dark"
+          style="font-weight: bold; font-size: small"
+          class="ion-text-lg-lowercase"
+        >
+          {{ order.totalPrice | currency: "USD" }}
+        </ion-text>
+        <ion-text
+          *ngIf="orderView === 'deliverer'"
+          color="dark"
+          style="font-weight: bold; font-size: small"
+          class="ion-text-lg-lowercase"
+        >
+          {{ order.deliveryFee - order.deliveryCommission | currency: "USD" }}
+        </ion-text>
+      </ion-row>
+    </ion-card-header>
+  </ion-grid>
+</ion-card>

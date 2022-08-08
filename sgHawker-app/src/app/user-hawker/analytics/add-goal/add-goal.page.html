@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-title>Set Target: {{ cat }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid style="width: 90%;">
+    <ion-row>
+      <ion-col>
+        <img
+        style="width: 50; height: 50; display: block; margin: 0 auto"
+        src="../../../assets/goal2.png"
+      />
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none" style="--background-hover: #ffffff">
+          <ion-label position="stacked">Period</ion-label>
+          <ion-select style='margin-top: 7px;'placeholder="--SELECT PERIOD--" [(ngModel)]="newGoal.goalPeriod">
+            <ion-select-option
+            *ngFor="let period of periodSelections"
+            [value]="period.value"
+            >{{period.label}}
+          </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="newGoal.goalPeriod === 'TARGETED'">
+      <ion-col>
+        <ion-row>
+          <ion-col style="margin-left: -5px;">
+            <ion-item lines="none" style="--background-hover: #ffffff">
+              <ion-label position="stacked">Start Date</ion-label>
+              <ion-datetime  style='margin-top: 7px;'
+              displayFormat="MM/DD/YYYY"
+              [min]="dateToday"
+              [max]="maxDate"
+              [(ngModel)]="newGoal.goalStartDate">
+            </ion-datetime>
+            </ion-item>
+          </ion-col>
+          <ion-col style="margin-right: -5px;">
+            <ion-item lines="none" style="--background-hover: #ffffff">
+              <ion-label position="stacked">End Date</ion-label>
+              <ion-datetime  style='margin-top: 7px;'
+              displayFormat="MM/DD/YYYY"
+              [min]="dateToday"
+              [max]="maxDate"
+              [(ngModel)]="newGoal.goalEndDate"></ion-datetime>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item lines="none">
+          <ion-label position="stacked">Target Amount:</ion-label>
+          <ion-input  style='margin-top: 7px;'
+          type="number"
+          [(ngModel)]="newGoal.targetAmount"
+        ></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button (click) = "submitGoal()" style="width: 100%; --background: #F2B354; --background-hover: #F4C276;">Submit</ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button (click) = "dismissModal()" style="width: 100%; --background: #ee4444; --background-hover:#f27373; ">Cancel</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

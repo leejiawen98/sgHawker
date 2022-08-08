@@ -1,0 +1,329 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="text-transform: capitalize">Report Details</ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="borderless-ion-card">
+          <ion-list lines="none" style="padding: 0 !important">
+            <ion-item>
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Report Number:
+              </ion-label>
+              <ion-text>
+                #{{ this.report._id.substring(this.report._id.length - 5) }}
+              </ion-text>
+            </ion-item>
+            <ion-item>
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Report Type:
+              </ion-label>
+              <ion-badge
+                *ngIf="report.reportType === 'FEEDBACK'"
+                color="success"
+              >
+                FEEDBACK
+              </ion-badge>
+              <ion-badge
+                *ngIf="report.reportType === 'COMPLAINT'"
+                color="danger"
+              >
+                COMPLAINT
+              </ion-badge>
+            </ion-item>
+            <ion-item>
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Report Date:
+              </ion-label>
+              <ion-text>
+                {{ this.report.reportDate | date: "medium" }}
+              </ion-text>
+            </ion-item>
+            <ion-item>
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Report By:
+              </ion-label>
+              <ion-text *ngIf="report.user">
+                {{ report.user.name }}
+              </ion-text>
+              <ion-text *ngIf="report.outlet">
+                {{ report.outlet.outletName }}
+              </ion-text>
+            </ion-item>
+            <ion-item *ngIf="this.report.complaintCategory">
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Complaint Category:
+              </ion-label>
+              <ion-badge color="warning">
+                {{ this.report.complaintCategory.toString().replace("_", " ") }}
+              </ion-badge>
+            </ion-item>
+            <ion-item>
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Report Status:
+              </ion-label>
+              <ion-badge color="danger" *ngIf="isReportOverdue()">
+                OVERDUE
+              </ion-badge>
+              <span *ngIf="!isReportOverdue()" [ngSwitch]="this.report">
+                <ion-badge color="warning" *ngSwitchCase="'IN_PROGRESS'">
+                  {{ this.report.reportStatus.toString().replace("_", " ") }}
+                </ion-badge>
+                <ion-badge color="success" *ngSwitchCase="'RESOLVED'">
+                  {{ this.report.reportStatus.toString().replace("_", " ") }}
+                </ion-badge>
+                <ion-badge color="success" *ngSwitchCase="'REFUNDED'">
+                  {{ this.report.reportStatus.toString().replace("_", " ") }}
+                </ion-badge>
+                <ion-badge color="success" *ngSwitchCase="'EMAIL'">
+                  {{ this.report.reportStatus.toString().replace("_", " ") }}
+                </ion-badge>
+                <ion-badge color="primary" *ngSwitchDefault>{{
+                  this.report.reportStatus.toString().replace("_", " ")
+                }}</ion-badge>
+              </span>
+            </ion-item>
+            <ion-item>
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Report Description:
+              </ion-label>
+              <ion-text
+                style="max-height: 100px; overflow-y: auto; max-width: 60%"
+              >
+                {{ this.report.reportDescription }}
+              </ion-text>
+            </ion-item>
+            <ion-item *ngIf="this.report.reportImage">
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Attachment:
+              </ion-label>
+              <ion-img
+                style="max-width: 60%; max-height: 100%"
+                *ngIf="this.report.reportImage !== ''"
+                src="{{ baseUrl }}/{{ this.report.reportImage }}"
+              ></ion-img>
+            </ion-item>
+            <ion-item *ngIf="this.report.order">
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Associated Order:
+              </ion-label>
+              <ion-button class="button-outline" (click)="viewOrderDetails()">
+                View Order Details
+              </ion-button>
+            </ion-item>
+            <ion-item *ngIf="this.report.order">
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Customer Wallet:
+              </ion-label>
+              <ion-button
+                class="button-outline"
+                (click)="viewTransactionDetails(customerWallet)"
+              >
+                View Wallet Transactions
+              </ion-button>
+            </ion-item>
+            <ion-item *ngIf="this.report.order">
+              <ion-label
+                style="font-weight: bold; font-size: large; color: gray"
+              >
+                Outlet Wallet:
+              </ion-label>
+              <ion-button
+                class="button-outline"
+                (click)="viewTransactionDetails(outletWallet)"
+              >
+                View Wallet Transactions
+              </ion-button>
+            </ion-item>
+          </ion-list>
+          <br />
+          <div
+            style="border-bottom: 1px solid black; padding: 0 !important"
+          ></div>
+          <ion-list lines="none">
+            <ion-item>
+              <h3 style="font-weight: bold">Administrator Actions</h3>
+              <ion-button
+                (click)="toggleShowResponse()"
+                class="button-small"
+                *ngIf="
+                  this.backUpReport.reportStatus === 'NEW' && !showResponse
+                "
+                style="margin-left: auto"
+              >
+                <ion-icon name="add-outline" slot="start"> </ion-icon>
+                Add Response
+              </ion-button>
+              <ion-button
+                (click)="toggleShowResponse()"
+                class="button-small"
+                *ngIf="
+                  this.backUpReport.reportStatus !== 'NEW' && !showResponse
+                "
+                style="margin-left: auto"
+              >
+                <ion-icon name="pencil" slot="start"> </ion-icon>
+                Edit Response
+              </ion-button>
+              <ion-button
+                class="button-small"
+                color="warning"
+                style="margin-left: auto"
+                *ngIf="showResponse && report.order"
+                (click)="viewRefundDetails()"
+              >
+                <ion-icon slot="start" name="cash-outline"></ion-icon>
+                Process Refund
+              </ion-button>
+            </ion-item>
+            <div
+              *ngIf="this.backUpReport.reportStatus !== 'NEW' && !showResponse"
+            >
+              <ion-item>
+                <ion-label style="font-weight: bold; font-size: large">
+                  Reply Date:
+                </ion-label>
+                <ion-text>
+                  {{ this.report.reportReplyDate | date: "medium" }}
+                </ion-text>
+              </ion-item>
+              <ion-item>
+                <ion-label style="font-weight: bold; font-size: large">
+                  Reply:
+                </ion-label>
+                <ion-text
+                  style="max-height: 100px; overflow-y: auto; max-width: 60%"
+                  *ngIf="this.report.reportReply"
+                >
+                  {{ this.report.reportReply }}
+                </ion-text>
+              </ion-item>
+              <ion-item>
+                <ion-label style="font-weight: bold; font-size: large">
+                  Email Attached:
+                </ion-label>
+                <ion-text>
+                  {{ this.report.emailAttached ? "Yes" : "No" }}
+                </ion-text>
+              </ion-item>
+            </div>
+            <div *ngIf="this.showResponse">
+              <ion-item>
+                <ion-label style="font-weight: bold; font-size: medium"
+                  >Update Report Status</ion-label
+                >
+                <ion-select
+                  [(ngModel)]="report.reportStatus"
+                  name="reportStatus"
+                >
+                  <ion-select-option value="NEW">New</ion-select-option>
+                  <ion-select-option value="IN_PROGRESS"
+                    >In Progress</ion-select-option
+                  >
+                  <ion-select-option value="RESOLVED"
+                    >Resolved</ion-select-option
+                  >
+                  <ion-select-option value="REFUNDED"
+                    >Refunded</ion-select-option
+                  >
+                  <ion-select-option value="EMAIL">Email</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <ion-label style="font-weight: bold; font-size: medium">
+                  Reply:
+                </ion-label>
+                <ion-textarea
+                  placeholder="Enter more information here..."
+                  [(ngModel)]="report.reportReply"
+                  rows="5"
+                  required
+                ></ion-textarea>
+              </ion-item>
+              <ion-item>
+                <ion-label style="color: gray"> Attach Email </ion-label>
+                <ion-select [(ngModel)]="sendEmail" required>
+                  <ion-select-option value="YES"> Yes </ion-select-option>
+                  <ion-select-option value="NO"> No </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <ion-label style="color: gray"> Email All Parties </ion-label>
+                <ion-select
+                  [(ngModel)]="emailAll"
+                  [disabled]="sendEmail === 'NO' || sendEmail === undefined"
+                >
+                  <ion-select-option value="YES"> Email all </ion-select-option>
+                  <ion-select-option value="NO">
+                    Email user only
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <ion-button
+                  class="button-small"
+                  *ngIf="this.backUpReport.reportStatus !== 'NEW'"
+                  color="success"
+                  style="margin-left: auto"
+                  (click)="updateReportDetails()"
+                >
+                  <ion-icon name="checkmark-outline" slot="start"> </ion-icon>
+                  Confirm Edit
+                </ion-button>
+                <ion-button
+                  class="button-small"
+                  *ngIf="this.backUpReport.reportStatus === 'NEW'"
+                  color="success"
+                  style="margin-left: auto"
+                  (click)="updateReportDetails()"
+                >
+                  <ion-icon name="checkmark-outline" slot="start"> </ion-icon>
+                  Confirm Reply
+                </ion-button>
+                <ion-button
+                  (click)="toggleShowResponse()"
+                  class="button-small"
+                  color="danger"
+                >
+                  <ion-icon name="trash" slot="start"> </ion-icon>
+                  Cancel
+                </ion-button>
+              </ion-item>
+            </div>
+          </ion-list>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

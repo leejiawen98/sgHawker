@@ -1,0 +1,239 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title *ngIf="transactionType === 'WITHDRAWAL'"
+        >Bank Transfer Transaction History</ion-title
+      >
+      <ion-title *ngIf="transactionType === 'TOP_UP'"
+        >Top Up Transaction History</ion-title
+      >
+      <ion-title *ngIf="transactionType === 'ORDER'"
+        >Order Transaction History</ion-title
+      >
+      <ion-title *ngIf="transactionType === 'SUBSCRIPTION_PAYMENT'"
+        >Subscription Payment History</ion-title
+      >
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-row class="ion-justify-content-center ion-align-items-center">
+              <ion-item style="width: 25%">
+                <ion-label style="font-weight: bold; color: gray"
+                  >Start Date</ion-label
+                >
+                <ion-datetime [(ngModel)]="startDate"></ion-datetime>
+              </ion-item>
+              &nbsp;&nbsp;
+              <ion-item style="width: 25%">
+                <ion-label style="font-weight: bold; color: gray"
+                  >End Date</ion-label
+                >
+                <ion-datetime [(ngModel)]="endDate"></ion-datetime>
+              </ion-item>
+              &nbsp;&nbsp;
+              <ion-button
+                color="info"
+                class="button-outline button-small"
+                (click)="filterByDuration()"
+                [disabled]="
+                  transactions?.length === 0 || !(startDate && endDate)
+                "
+              >
+                <ion-icon slot="start" name="funnel"></ion-icon>
+                Filter
+              </ion-button>
+              &nbsp;&nbsp;
+              <ion-button
+                color="danger"
+                class="button-has-icon-only button-small"
+                (click)="resetDurationFilter()"
+              >
+                <ion-icon slot="start" name="reload"></ion-icon>
+                Reset
+              </ion-button>
+              <ion-button
+                *ngIf="transactionType === 'WITHDRAWAL'"
+                class="button-small"
+                color="warning"
+                style="margin-left: auto"
+                (click)="showBankWithdrawalAlert()"
+              >
+                <ion-icon slot="start" name="cash-outline"></ion-icon>
+                Balance Withdrawal
+              </ion-button>
+              <ion-button
+                *ngIf="transactionType === 'SUBSCRIPTION_PAYMENT'"
+                class="button-small"
+                color="warning"
+                style="margin-left: auto"
+                (click)="chargeSubscriptionFeeForHawker()"
+                [class.button-disabled]="
+                  paymentStatus === 'PAID' || paymentStatus === ''
+                "
+              >
+                <ion-icon slot="start" name="cash-outline"></ion-icon>
+                Charge Subscription Fee
+              </ion-button>
+            </ion-row>
+            <br />
+            <br />
+            <table
+              *ngIf="this.transactions"
+              datatable="ng"
+              [dtOptions]="dtOptions"
+              class="row-border hover"
+            >
+              <thead>
+                <tr>
+                  <th>Transaction Date</th>
+                  <th *ngIf="transactionType === 'WITHDRAWAL'">
+                    Withdrawal Amount
+                  </th>
+                  <th *ngIf="transactionType === 'WITHDRAWAL'">Bank Account</th>
+                  <th *ngIf="transactionType === 'ORDER'">Order Number</th>
+                  <th *ngIf="transactionType === 'ORDER'">
+                    Paid Cashback Amount
+                  </th>
+                  <th *ngIf="transactionType === 'ORDER'">
+                    Paid Non-Cashback Amount
+                  </th>
+                  <th *ngIf="transactionType === 'ORDER'">
+                    Received Cashback Amount
+                  </th>
+                  <th *ngIf="transactionType === 'ORDER'">Refunded Amount</th>
+                  <th *ngIf="transactionType === 'SUBSCRIPTION_PAYMENT'">
+                    Account Tier
+                  </th>
+                  <th *ngIf="transactionType === 'SUBSCRIPTION_PAYMENT'">
+                    Payment Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody style="text-align: center">
+                <tr *ngFor="let transaction of this.transactions">
+                  <td>{{ transaction.transactionDate | date: "medium" }}</td>
+                  <td *ngIf="transactionType === 'WITHDRAWAL'">
+                    {{ transaction.withdrawalAmount | currency: "USD" }}
+                  </td>
+                  <td *ngIf="transactionType === 'WITHDRAWAL'">
+                    <ion-list lines="none" style="padding: 0; margin: 0">
+                      <ion-item
+                        style="font-size: small"
+                        class="ion-item-no-padding"
+                      >
+                        <ion-label style="font-weight: bold">
+                          Holder Name
+                        </ion-label>
+                        <ion-text>
+                          {{ transaction.bankAccountInvolved.fullName }}
+                        </ion-text>
+                      </ion-item>
+                      <ion-item
+                        style="font-size: small"
+                        class="ion-item-no-padding"
+                      >
+                        <ion-label style="font-weight: bold">
+                          Bank Name
+                        </ion-label>
+                        <ion-text>
+                          {{ transaction.bankAccountInvolved.nameOfBank }}
+                        </ion-text>
+                      </ion-item>
+                      <ion-item
+                        style="font-size: small"
+                        class="ion-item-no-padding"
+                      >
+                        <ion-label style="font-weight: bold">
+                          Account Number
+                        </ion-label>
+                        <ion-text>
+                          {{ transaction.bankAccountInvolved.accountNumber }}
+                        </ion-text>
+                      </ion-item>
+                    </ion-list>
+                  </td>
+                  <td *ngIf="transactionType === 'ORDER'">
+                    <ion-text>
+                      #{{
+                        transaction.order?._id.substring(
+                          transaction.order?._id.length - 5
+                        )
+                      }}
+                    </ion-text>
+                  </td>
+                  <td *ngIf="transactionType === 'ORDER'">
+                    <ion-text>
+                      {{
+                        transaction.paidCashbackAmount
+                          ? (transaction.paidCashbackAmount | currency: "USD")
+                          : "-"
+                      }}
+                    </ion-text>
+                  </td>
+                  <td *ngIf="transactionType === 'ORDER'">
+                    <ion-text>
+                      {{
+                        transaction.paidNonCashbackAmount
+                          ? (transaction.paidNonCashbackAmount
+                            | currency: "USD")
+                          : "-"
+                      }}
+                    </ion-text>
+                  </td>
+                  <td *ngIf="transactionType === 'ORDER'">
+                    <ion-text>
+                      {{
+                        transaction.receivedCashbackAmount
+                          ? (transaction.receivedCashbackAmount
+                            | currency: "USD")
+                          : "-"
+                      }}
+                    </ion-text>
+                  </td>
+                  <td *ngIf="transactionType === 'ORDER'">
+                    <ion-text>
+                      {{
+                        transaction.refundedAmount
+                          ? (transaction.refundedAmount | currency: "USD")
+                          : "-"
+                      }}
+                    </ion-text>
+                  </td>
+                  <td *ngIf="transactionType === 'SUBSCRIPTION_PAYMENT'">
+                    <ion-badge
+                      color="primary"
+                      *ngIf="outlet.hawkerAccount.accountTier === 'PREMIUM'"
+                      >PREMIUM
+                    </ion-badge>
+                    <ion-badge
+                      color="tertiary"
+                      *ngIf="outlet.hawkerAccount.accountTier === 'DELUXE'"
+                      >DELUXE</ion-badge
+                    >
+                  </td>
+                  <td *ngIf="transactionType === 'SUBSCRIPTION_PAYMENT'">
+                    <ion-text>
+                      {{ transaction.paymentAmount | currency: "USD" }}
+                    </ion-text>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

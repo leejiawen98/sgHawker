@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Customer Accounts</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col size="9.5">
+        <ion-text>
+          <h1 style="margin-left: 20px">All Customers</h1>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-end" style="margin-top: -25px">
+        <ion-button
+          size="small"
+          color="warning"
+          fill="solid"
+          (click)="viewPending()"
+          >View Pending Vaccination</ion-button
+        >
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <table
+              *ngIf="allCustomers.length > 0"
+              datatable="ng"
+              class="row-border hover"
+            >
+              <thead>
+                <tr>
+                  <th>Account Name</th>
+                  <th>Email</th>
+                  <th>Phone Number</th>
+                  <th>Account Status</th>
+                  <th>Currently Login</th>
+                  <th>Last Login</th>
+                  <th>Vaccination Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody style="text-align: center">
+                <tr *ngFor="let customer of allCustomers">
+                  <td>{{ customer.name }}</td>
+                  <td>{{ customer.email }}</td>
+                  <td>
+                    <span *ngIf="!customer.lastLoggedIn"> - </span>
+                    {{ customer.phone }}
+                  </td>
+                  <td [ngSwitch]="customer.accountStatus">
+                    <ion-badge color="danger" *ngSwitchCase="'SUSPENDED'">
+                      {{customer.accountStatus}}
+                    </ion-badge>
+                    <ion-badge color="success" *ngSwitchCase="'ACTIVE'">
+                      {{customer.accountStatus}}
+                    </ion-badge>
+                    <ion-badge color="primary" *ngSwitchDefault
+                      >{{customer.accountStatus}}</ion-badge
+                    >
+                  </td>
+                  <td>
+                    <ion-badge
+                      color="success"
+                      *ngIf="customer.currentlyLoggedIn"
+                      >Logged In</ion-badge
+                    >
+                    <ion-badge color="light" *ngIf="!customer.currentlyLoggedIn"
+                      >Logged Out</ion-badge
+                    >
+                  </td>
+                  <td>
+                    <span *ngIf="!customer.lastLoggedIn"> - </span>
+                    {{customer.lastLoggedIn | date:'medium'}}
+                  </td>
+                  <td>
+                    <ion-badge color="success" *ngIf="customer.isVaccinated"
+                      >Vaccinated</ion-badge
+                    >
+                    <ion-badge color="danger" *ngIf="!customer.isVaccinated"
+                      >Not Vaccinated</ion-badge
+                    >
+                  </td>
+                  <td>
+                    <ion-button
+                      class="button-outline"
+                      (click)="goToDetailsPage(customer)"
+                      >View Details</ion-button
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

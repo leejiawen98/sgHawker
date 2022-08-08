@@ -1,0 +1,235 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Report Management</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row class="ion-align-items-center">
+      <ion-col size="10">
+        <ion-text>
+          <h1 style="margin-left: 20px">All Reports</h1>
+        </ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <div *ngIf="showFilter">
+              <ion-row class="ion-align-items-center">
+                <ion-col size="1" style="margin-left: 20px; font-weight: bold">
+                  Report Type:
+                </ion-col>
+                <ion-col size="3">
+                  <ion-segment
+                    [value]="reportType"
+                    (ionChange)="reportTypeChanged($event)"
+                  >
+                    <ion-segment-button value="ALL">
+                      <ion-label>All</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="FEEDBACK">
+                      <ion-label>Feedbacks</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="COMPLAINT">
+                      <ion-label>Complaints</ion-label>
+                    </ion-segment-button>
+                  </ion-segment>
+                </ion-col>
+                <ion-col size="8"></ion-col>
+              </ion-row>
+              <ion-row class="ion-align-items-center">
+                <ion-col size="1" style="margin-left: 20px; font-weight: bold">
+                  User Type:
+                </ion-col>
+                <ion-col size="2">
+                  <ion-segment
+                    [value]="userType"
+                    (ionChange)="userTypeChanged($event)"
+                  >
+                    <ion-segment-button value="ALL">
+                      <ion-label>All</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="CUSTOMER">
+                      <ion-label>Customer</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="OUTLET">
+                      <ion-label>Outlet</ion-label>
+                    </ion-segment-button>
+                  </ion-segment>
+                </ion-col>
+                <ion-col size="9"></ion-col>
+              </ion-row>
+              <ion-row class="ion-align-items-center">
+                <ion-col size="1" style="margin-left: 20px; font-weight: bold">
+                  Status:
+                </ion-col>
+                <ion-col size="5">
+                  <ion-segment
+                    [value]="reportStatus"
+                    (ionChange)="reportStatusChanged($event)"
+                  >
+                    <ion-segment-button value="ALL">
+                      <ion-label>All</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="NEW">
+                      <ion-label>New</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="IN_PROGRESS">
+                      <ion-label>In Progress</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="RESOLVED">
+                      <ion-label>Resolved</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="REFUNDED">
+                      <ion-label>Refunded</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="EMAIL">
+                      <ion-label>Email</ion-label>
+                    </ion-segment-button>
+                  </ion-segment>
+                </ion-col>
+                <ion-col size="6"> </ion-col>
+              </ion-row>
+              <ion-row class="ion-align-items-center">
+                <ion-text
+                  style="margin-left: 20px; margin-right: 3%; font-weight: bold"
+                  >Date Reported:</ion-text
+                >
+                <ion-item style="width: 25%">
+                  <ion-label style="font-size: small; color: gray"
+                    >Start Date</ion-label
+                  >
+                  <ion-datetime [(ngModel)]="startDate"></ion-datetime>
+                </ion-item>
+                &nbsp;&nbsp;
+                <ion-item style="width: 25%">
+                  <ion-label style="font-size: small; color: gray"
+                    >End Date</ion-label
+                  >
+                  <ion-datetime [(ngModel)]="endDate"></ion-datetime>
+                </ion-item>
+              </ion-row>
+              <br />
+              <ion-row>
+                <ion-col>
+                  <ion-button
+                    color="info"
+                    class="button-outline button-small"
+                    style="margin-left: 20px"
+                    (click)="filterRecords()"
+                  >
+                    <ion-icon slot="start" name="funnel"></ion-icon>
+                    Apply Filter
+                  </ion-button>
+                  <ion-button
+                    color="danger"
+                    class="button-has-icon-only button-small"
+                    (click)="resetAllFilters()"
+                  >
+                    <ion-icon slot="start" name="reload"></ion-icon>
+                    Reset All Filters
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+              <br />
+              <br />
+            </div>
+            <table
+              *ngIf="reports.length > 0"
+              datatable="ng"
+              [dtOptions]="dtOptions"
+              class="row-border hover"
+            >
+              <thead>
+                <tr>
+                  <th>Report Number</th>
+                  <th>Report Type</th>
+                  <th>User Type</th>
+                  <th>Report Date</th>
+                  <th>Report Status</th>
+                  <th>Reported By</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody style="text-align: center">
+                <tr *ngFor="let report of reports">
+                  <td>#{{report._id.substring(report._id.length - 5)}}</td>
+                  <td>
+                    <ion-badge
+                      *ngIf="report.reportType==='FEEDBACK'"
+                      color="warning"
+                      >FEEDBACK</ion-badge
+                    >
+                    <ion-badge
+                      *ngIf="report.reportType==='COMPLAINT'"
+                      color="danger"
+                      >COMPLAINT</ion-badge
+                    >
+                  </td>
+                  <td>
+                    <ion-badge *ngIf="report.user" color="light">
+                      CUSTOMER
+                    </ion-badge>
+                    <ion-badge *ngIf="report.outlet" color="dark">
+                      OUTLET
+                    </ion-badge>
+                  </td>
+                  <td>{{ report.reportDate | date: "medium"}}</td>
+                  <td>
+                    <span *ngIf="isReportOverdue(report)">
+                      <ion-badge color="danger"> OVERDUE </ion-badge>
+                    </span>
+                    <span
+                      *ngIf="!isReportOverdue(report)"
+                      [ngSwitch]="report.reportStatus"
+                    >
+                      <ion-badge color="warning" *ngSwitchCase="'IN_PROGRESS'">
+                        {{report.reportStatus.toString().replace('_', " ")}}
+                      </ion-badge>
+                      <ion-badge color="success" *ngSwitchCase="'RESOLVED'">
+                        {{report.reportStatus.toString().replace('_', " ")}}
+                      </ion-badge>
+                      <ion-badge color="success" *ngSwitchCase="'REFUNDED'">
+                        {{report.reportStatus.toString().replace('_', " ")}}
+                      </ion-badge>
+                      <ion-badge color="success" *ngSwitchCase="'EMAIL'">
+                        {{report.reportStatus.toString().replace('_', " ")}}
+                      </ion-badge>
+                      <ion-badge color="primary" *ngSwitchDefault
+                        >{{report.reportStatus.toString().replace('_', "
+                        ")}}</ion-badge
+                      >
+                    </span>
+                  </td>
+                  <td>
+                    <ion-text *ngIf="report.user">
+                      {{ report.user.name }}
+                    </ion-text>
+                    <ion-text *ngIf="report.outlet">
+                      {{ report.outlet.outletName }}
+                    </ion-text>
+                  </td>
+                  <td>
+                    <ion-button
+                      class="button-outline"
+                      (click)="showReportDetails(report)"
+                      >View Details</ion-button
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

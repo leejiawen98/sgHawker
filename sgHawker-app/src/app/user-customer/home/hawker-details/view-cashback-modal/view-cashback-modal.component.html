@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar class="customer-header-background-color">
+    <ion-buttons slot="primary">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close" style="color: white;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-row class="ion-align-items-center ion-justify-content-end">
+      <ion-title style="color: white;"> Cashback </ion-title>
+    </ion-row>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label>Outlet</ion-label>
+    <ion-text style="text-align: end;">{{outlet.outletName}}</ion-text>
+  </ion-item>
+  <ion-item>
+    <ion-label>Cashback Rate</ion-label>
+    <ion-text style="text-align: end;">{{outlet.cashbackRate}}%</ion-text>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+      Simulation
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-list>
+      <ion-item>
+        Order #123
+      </ion-item>
+      <ion-item>
+        <ion-list>
+          <ion-item lines="none">
+            Chicken Rice x1 $3.50
+          </ion-item>
+          <ion-item lines="none">
+            Wanton Mee x1 $3.00
+          </ion-item>
+        </ion-list>
+      </ion-item>
+
+      <ion-item>
+        <ion-text>Total Price:</ion-text>
+        <ion-text>&nbsp;$6.50</ion-text>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-text>Cashback Earnings:</ion-text>
+        <ion-text style="color:green">&nbsp;{{simulatedCashback | currency: 'USD'}}</ion-text>
+      </ion-item>
+    </ion-list>
+  </ion-item>
+</ion-content>

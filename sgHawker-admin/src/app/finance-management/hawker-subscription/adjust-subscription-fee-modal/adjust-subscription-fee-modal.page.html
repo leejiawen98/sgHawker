@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Adjust Subscription Fees</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="dismissModal()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <form
+      [formGroup]="subscriptionFeeForm"
+      (ngSubmit)="adjustSubscriptionFees()"
+    >
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label>Premium subscription fee</ion-label>
+            <ion-input
+              type="text"
+              formControlName="premium"
+              (ngModelChange)="checkFormValid()"
+              placeholder="Please enter premium fee"
+            ></ion-input>
+            &nbsp;<span style="color: gray; font-size: small; font-weight: bold"
+              >SGD / MONTH</span
+            >
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <!-- Error Message -->
+      <ion-row>
+        <span *ngIf="formSubmitted && errorControl.premium.errors?.required"
+          >Premium Fee is required.</span
+        >
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label>Deluxe subscription fee</ion-label>
+            <ion-input
+              type="text"
+              formControlName="deluxe"
+              (ngModelChange)="checkFormValid()"
+              placeholder="Please enter deluxe fee"
+            ></ion-input>
+            &nbsp;<span style="color: gray; font-size: small; font-weight: bold"
+              >SGD / MONTH</span
+            >
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <!-- Error Message -->
+      <ion-row>
+        <span *ngIf="formSubmitted && errorControl.deluxe.errors?.required"
+          >Deluxe Fee is required.</span
+        >
+      </ion-row>
+
+      <br />
+      <ion-row>
+        <ion-col style="display: flex; justify-content: center">
+          <ion-button
+            color="primary"
+            type="submit"
+            [class.button-disabled]="!formValid"
+          >
+            <ion-icon slot="start" name="checkmark"></ion-icon>
+            Submit
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
+  </ion-grid>
+</ion-content>

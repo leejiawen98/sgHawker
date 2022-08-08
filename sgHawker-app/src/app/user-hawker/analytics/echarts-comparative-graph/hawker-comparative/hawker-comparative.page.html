@@ -1,0 +1,106 @@
+<ion-header>
+  <ion-toolbar class="hawker-header-background-color">
+    <ion-title>Comparison:
+      <span *ngIf="dayFilter === 'LAST_7_DAYS'">Past 7 days</span>
+      <span *ngIf="dayFilter === 'LAST_30_DAYS'">Past 30 days</span>
+      <span *ngIf="dayFilter === 'LAST_60_DAYS'">Past 60 days</span>
+      <span *ngIf="dayFilter === 'Overall'">Overall</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()" style="font-size: 15px;" fill="clear">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid *ngIf="!isLoading">
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <h1>{{selectedOutlet.outletName}}
+          <ion-chip *ngIf="currentHawker.numOfSales < subHawkerDetails.numOfSales"color="success">
+            <ion-icon name="arrow-up-outline" color="success"></ion-icon>
+            <span>{{((subHawkerDetails.numOfSales / currentHawker.numOfSales) - 1 ) * 100 | number:'1.2-2'}}%</span>
+          </ion-chip>
+          <ion-chip *ngIf="this.currentHawker.numOfSales > subHawkerDetails.numOfSales"color="danger">
+            <ion-icon name="arrow-down-outline" color="danger"></ion-icon>
+            <span>{{((currentHawker.numOfSales / subHawkerDetails.numOfSales)- 1) * 100 | number:'1.2-2'}}%</span>
+          </ion-chip>
+          <ion-chip *ngIf="currentHawker.numOfSales === subHawkerDetails.numOfSales"color="warning">
+            <span>0%</span>
+          </ion-chip>
+        </h1>
+        <p style="margin-top: -5px;">Rank: {{subHawkerDetails.ranking}}</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-card style="height: 400px;">
+          <ion-card-header>
+            <ion-card-title class="ion-text-center">Sales Breakdown Per Day</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div *ngIf=" currentOutletLineData !== undefined && selectedOutletLineData !== undefined"  class="chart-wrapper">
+              <div echarts [initOpts]="lineChartFormat" [options]="lineChartOption" class="chart"></div>
+            </div>
+            <div *ngIf=" currentOutletLineData === undefined || selectedOutletLineData === undefined" style="margin-top: 56px;" >
+              <div class ="ion-text-center" style="color: grey;">
+                <img src="./assets/Logo - Black.svg" style="opacity: 0.5; width: 200px;"/>
+                <h1>No data available</h1>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="7.5">
+        <ion-card style="height: 300px;">
+          <ion-card-header>
+            <ion-card-title class="ion-text-center">Food Item Sales</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div *ngIf=" selectedOutletPieChartData.length !== 0 "  class="chart-wrapper">
+              <div echarts [initOpts]="pieChartFormat" [options]="pieChartOption" class="chart"></div>
+            </div>
+            <div *ngIf=" selectedOutletPieChartData.length === 0 " style="margin-top: 56px;" >
+              <div class ="ion-text-center" style="color: grey;">
+                <img src="./assets/Logo - Black.svg" style="opacity: 0.5; width: 200px;"/>
+                <h1>No data available</h1>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="4.5">
+        <ion-card style="height: 300px;">
+          <ion-card-header>
+            <ion-card-title class="ion-text-center">Different Food Items</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="groupList" *ngIf=" differentFoodItem.length !== 0 ">
+            <ion-item-sliding>
+              <ion-list *ngFor="let diff of differentFoodItem" style="padding-bottom: 10px;">
+                <ion-item>
+                  <ion-thumbnail slot="start">
+                    <img src="{{baseUrl}}/{{diff.itemImageSrc}}">
+                  </ion-thumbnail>
+                  <ion-label>{{diff.itemName}}</ion-label>
+                  <ion-button (click) = "viewFoodItemDetails(diff)">VIEW</ion-button>
+                </ion-item>
+              </ion-list>
+            </ion-item-sliding>
+            </div>
+            <div *ngIf=" differentFoodItem.length === 0 " style="margin-top: 56px;" >
+              <div class ="ion-text-center" style="color: grey;">
+                <img src="./assets/Logo - Black.svg" style="opacity: 0.5; width: 200px;"/>
+                <h1>No different food item available</h1>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
